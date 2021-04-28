@@ -46,10 +46,10 @@ function setup() {
   prepImage();
   entity_system = new ESystem();
   entity_system.addEntity(createVector(100,100), 
-  						10.0, 40.0, aball, 40, 40, 1);
+  						10.0, 40.0, aball, 40,40,0,0,1);
 
   entity_system.addEntity(createVector(200,100), 
-    						5.0, 30.0, aball, 30, 30, 0);
+    						5.0, 30.0, aball, 30,30,0,0,0);
 }
 
 function playSound(){
@@ -81,7 +81,7 @@ Rendering
 
 
 //Entity class
-let Game_Entity = function(position, mass, radius, sprite, spritew, spriteh){
+let Game_Entity = function(position, mass, radius, sprite, spritew, spriteh, renderoffx, renderoffy){
 	this.position = position.copy();
 	this.sprite = sprite;
 	this.velocity = createVector(0,0);
@@ -161,8 +161,8 @@ let ESystem = function(){
 	this.entities = [];
 };
 
-ESystem.prototype.addEntity = function(position, mass, radius, sprite, spritew, spriteh, isPlayer){
-	this.entities.push(new Game_Entity(position, mass, radius, sprite, spritew, spriteh))
+ESystem.prototype.addEntity = function(position, mass, radius, sprite, spritew, spriteh, renderoffx, renderoffy, isPlayer){
+	this.entities.push(new Game_Entity(position, mass, radius, sprite, spritew, spriteh, renderoffx, renderoffy))
 	this.entities[this.entities.length - 1].isPlayer = isPlayer;
 };
 
