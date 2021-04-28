@@ -140,12 +140,18 @@ Game_Entity.prototype.collide = function(other){
 			if(other.mass != 0)
 				vec2.mult(mass_ratio_them);
 			this.position.add(vec2);
+			//TODO: collision restitution.
+			vec2.mult(0.5);
+			this.velocity.add(vec2);
 		}
 		if(other.mass > 0){
 			let vec2 = vec.copy();
 			if(this.mass != 0)
 				vec2.mult(mass_ratio_me);
 			other.position.add(vec2);
+			//TODO: collision restitution.
+			vec2.mult(0.5);
+			other.velocity.add(vec2);
 		}
 	}
 };
