@@ -46,10 +46,10 @@ function setup() {
   prepImage();
   entity_system = new ESystem();
   entity_system.addEntity(createVector(100,100), 
-  						10.0, 40.0, 0.0, aball, 40,40,0,0,1);
+  						10.0, 40.0, 0.0, 0.94, aball, 40,40,0,0,1);
 
   entity_system.addEntity(createVector(200,100), 
-    						5.0, 30.0, 0.0, aball, 30,30,0,10,0);
+    						5.0, 30.0, 0.0, 0.99, aball, 30,30,0,10,0);
 }
 
 function playSound(){
@@ -81,7 +81,7 @@ Rendering
 
 
 //Entity class
-let Game_Entity = function(position, mass, radius, radius2, sprite, spritew, spriteh, renderoffx, renderoffy){
+let Game_Entity = function(position, mass, radius, radius2, friction, sprite, spritew, spriteh, renderoffx, renderoffy){
 	this.position = position.copy();
 	this.sprite = sprite;
 	this.velocity = createVector(0,0);
@@ -92,25 +92,32 @@ let Game_Entity = function(position, mass, radius, radius2, sprite, spritew, spr
 	this.spriteh = spriteh;
 	this.renderoffx = renderoffx;
 	this.renderoffy = renderoffy;
+	this.friction = friction;
 	this.isPlayer = 0;
 };
 
 Game_Entity.prototype.integrate = function(){
 	if(this.isPlayer){
-		this.velocity = createVector(0,0);
-		let have_pressed = 1;
-		if(keyIsDown(UP_ARROW)) this.velocity.y -= 1;
-		if(keyIsDown(DOWN_ARROW)) this.velocity.y += 1;
-		if(keyIsDown(RIGHT_ARROW)) this.velocity.x += 1;
-		if(keyIsDown(LEFT_ARROW)) this.velocity.x -= 1;
-		this.velocity.normalize(); this.velocity.mult(player_max_vel);
+		let adder = createVector(0,0);
+		this.velocity.mult(0.8); //simulate a LOT of friction.
+		let have_pressed = 0;
+		if(keyIsDown(UP_ARROW)) {adder.y -= 0.9;have_pressed = 1;}
+		if(keyIsDown(DOWN_ARROW)) {adder.y += 0.9;have_pressed = 1;}
+		if(keyIsDown(RIGHT_ARROW)) {adder.x += 0.9;have_pressed = 1;}
+		if(keyIsDown(LEFT_ARROW)) {adder.x -= 0.9;have_pressed = 1;}
+		if(have_pressed)
+			this.velocity.add(adder);
+		if(this.velocity.magSq() > player_max_vel * player_max_vel){
+			this.velocity.normalize(); this.velocity.mult(player_max_vel);
+		}
+		
 	} else {
 		this.velocity.add(this.accel);
-		if(this.velocity.magSq() > entity_max_vel){
+		if(this.velocity.magSq() > entity_max_vel * entity_max_vel){
 			this.velocity.normalize(); this.velocity.mult(entity_max_vel);
 		}
-		this.velocity.mult(0.99); //simulate friction.
 	}
+	this.velocity.mult(this.friction); //simulate a LOT of friction.
 	this.position.add(this.velocity);
 };
 
@@ -171,8 +178,8 @@ let ESystem = function(){
 	this.entities = [];
 };
 
-ESystem.prototype.addEntity = function(position, mass, radius, radius2, sprite, spritew, spriteh, renderoffx, renderoffy, isPlayer){
-	this.entities.push(new Game_Entity(position, mass, radius, radius2, sprite, spritew, spriteh, renderoffx, renderoffy))
+ESystem.prototype.addEntity = function(position, mass, radius, radius2, friction, sprite, spritew, spriteh, renderoffx, renderoffy, isPlayer){
+	this.entities.push(new Game_Entity(position, mass, radius, radius2, friction, sprite, spritew, spriteh, renderoffx, renderoffy))
 	this.entities[this.entities.length - 1].isPlayer = isPlayer;
 };
 
