@@ -50,12 +50,13 @@ function setup() {
   entity_system.addEntity(createVector(100,100), 
   						10.0, 40.0, 40.0, 0.94, ahead1, 40,40,0,0,1);
   player = entity_system.entities[0];
- for(let i = 0; i < 100; i++){
+ for(let i = 0; i < 350; i++){
   entity_system.addEntity(createVector(random(10,width-10),random(10,height-10)),
     						random(0.1,0.8), 10.0, 0.0, random(0.99, 1.0), aball, 10,10,0,3,0);
   entity_system.entities[entity_system.entities.length-1].accel = createVector(0,
   	-random(0.001, 0.02));
  }
+ 
 }
 
 function playSound(){
@@ -78,19 +79,21 @@ for(let i = 1; i < entity_system.entities.length; i++){
 }
 let ppos = player.position.copy();
 ppos.sub(renderOffset);
-if(ppos.x + player.boxdims.x > width-70) renderOffset.x += constrain(1.01*player.velocity.x,1,player_max_vel);
-if(ppos.x - player.boxdims.x < 70) renderOffset.x += constrain(1.01*player.velocity.x,-player_max_vel,-1);
+if(ppos.x + player.boxdims.x > width-70) renderOffset.x += constrain(1.04*player.velocity.x,1,player_max_vel);
+if(ppos.x - player.boxdims.x < 70) renderOffset.x += constrain(1.04*player.velocity.x,-player_max_vel,-1);
 
-if(ppos.y + player.boxdims.y > height-70) renderOffset.y += constrain(1.01*player.velocity.y,1,player_max_vel);
-if(ppos.y - player.boxdims.y < 70) renderOffset.y += constrain(1.01*player.velocity.y,-player_max_vel,-1);
+if(ppos.y + player.boxdims.y > height-70) renderOffset.y += constrain(1.04*player.velocity.y,1,player_max_vel);
+if(ppos.y - player.boxdims.y < 70) renderOffset.y += constrain(1.04*player.velocity.y,-player_max_vel,-1);
 /*
 Rendering
 */
 
   background(51);
   image(backg, 0, 0);
-  //system.addParticle();
-  //system.run();
+  system.origin = player.position.copy();
+  system.origin.sub(renderOffset);
+  system.addParticle();
+  system.run();
   
   color(255,255,255,255);
   stroke(255,255,255);
@@ -135,7 +138,8 @@ Game_Entity.prototype.integrate = function(){
 	} else {
 		this.velocity.add(this.accel);
 		if(this.velocity.magSq() > entity_max_vel * entity_max_vel){
-			this.velocity.normalize(); this.velocity.mult(entity_max_vel);
+			//this.velocity.normalize(); this.velocity.mult(entity_max_vel);
+			this.velocity.mult(0.99);
 		}
 	}
 	this.position.add(this.velocity);
@@ -145,15 +149,16 @@ Game_Entity.prototype.integrate = function(){
 Game_Entity.prototype.render = function(){
 	let rpos = this.position.copy();
 	rpos.sub(renderOffset);
-	
 	image(this.sprite, rpos.x + this.renderoffx - this.spritew/2, rpos.y  + this.renderoffy - this.spriteh/2, this.spritew, this.spriteh);
 	noStroke();
 	fill(255,255,0,100);
+	/*
 	if(debug_render_col)
 		if(this.boxdims.y == 0)
 			ellipse(rpos.x, rpos.y, this.boxdims.x*2, this.boxdims.x*2);
 		else
 			rect(rpos.x - this.boxdims.x, rpos.y - this.boxdims.y, this.boxdims.x*2, this.boxdims.y*2);
+	*/
 };
 
 Game_Entity.prototype.collide = function(other){
@@ -243,7 +248,7 @@ Game_Entity.prototype.collide = function(other){
 				vec = v.copy(); vec.mult(diff/len);
 				if(isBoxVCirc != 2)
 					vec.mult(-1);
-			} else {
+			} else { //boxvbox subcase
 				let sumextents = this.boxdims.copy();
 				sumextents.add(other.boxdims);
 				let b1c = this.position;
@@ -302,20 +307,18 @@ Game_Entity.prototype.collide = function(other){
 			if(other.mass != 0)
 				vec2.mult(mass_ratio_them);
 			this.position.add(vec2);
-			//TODO: collision restitution.
 			vec2.mult(0.5);
 			vec2.mult(other.friction * this.friction);
 			this.velocity.add(vec2);
 		}
 		if(other.mass > 0){
-			let vec2 = vec.copy();
+			//let vec2 = vec.copy();
 			if(this.mass != 0)
-				vec2.mult(mass_ratio_me);
-			other.position.add(vec2);
-			//TODO: collision restitution.
-			vec2.mult(0.5);
-			vec2.mult(other.friction * this.friction);
-			other.velocity.add(vec2);
+				vec.mult(mass_ratio_me);
+			other.position.add(vec);
+			vec.mult(0.5);
+			vec.mult(other.friction * this.friction);
+			other.velocity.add(vec);
 		}
 	}
 };
@@ -370,7 +373,8 @@ let Particle = function(position) {
   this.acceleration = createVector(0, 0.05);
   this.velocity = createVector(random(-1, 1), random(-1, 0));
   this.position = position.copy();
-  this.lifespan = 255;
+  this.position.add(renderOffset);
+  this.lifespan = 1024;
 };
 
 Particle.prototype.run = function() {
@@ -389,7 +393,7 @@ Particle.prototype.update = function(){
 Particle.prototype.display = function() {
   noStroke();
   fill(this.color.x, this.color.y, this.color.z, this.lifespan);
-  ellipse(this.position.x, this.position.y, 12, 12);
+  ellipse(this.position.x -renderOffset.x, this.position.y -renderOffset.y, 12, 12);
 };
 
 // Is the particle still useful?
