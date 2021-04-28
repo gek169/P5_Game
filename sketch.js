@@ -11,6 +11,7 @@ let renderOffset;
 const entity_max_vel = 500;
 const player_max_vel = 4;
 const debug_render_col = 0;
+let wintx; let winty;
 
 function preload(){
 	soundeffect = loadSound('assets/click.wav');
@@ -20,26 +21,28 @@ function preload(){
 }
 
 function prepImage(){
-	background(51);
-	image(backg, 0, 0);
-	let d = pixelDensity();
-	loadPixels();
-	for(let i = 0; i < width * height * 4 * d  * d; i+=4){
-		pixels[i+0] = pixels[i+0] * 0.5;
-		pixels[i+1] = pixels[i+1] * 0.5;
-		pixels[i+2] = pixels[i+2] * 1.0;
-		pixels[i+3] = 255;
+	let bffr = createGraphics(backg.width, backg.height);
+	//bffr.pixelDensity(1);
+	bffr.background(101);
+	bffr.image(backg, 0, 0);
+	let d = bffr.pixelDensity();
+	bffr.loadPixels();
+	for(let i = 0; i < bffr.width * bffr.height * 4 * d  * d; i+=4){
+		bffr.pixels[i+0] = bffr.pixels[i+0] * 0.5;
+		bffr.pixels[i+1] = bffr.pixels[i+1] * 0.5;
+		bffr.pixels[i+2] = bffr.pixels[i+2] * 1.0;
+		bffr.pixels[i+3] = 255;
 	}
-	
-	updatePixels();
-	filter(DILATE);
-	filter(POSTERIZE, 5);
-	backg = get();
+	bffr.updatePixels();
+	bffr.filter(DILATE);
+	bffr.filter(POSTERIZE, 5);
+	backg = bffr.get();
 }
 
 function setup() {
   url = getURL();
   pixelDensity(1);
+  //cnv = createCanvas(640, 480, WEBGL);
   cnv = createCanvas(640, 480);
   cnv.mousePressed(playSound);
   system = new ParticleSystem(createVector(width / 2, 50));
@@ -56,7 +59,9 @@ function setup() {
   entity_system.entities[entity_system.entities.length-1].accel = createVector(0,
   	-random(0.001, 0.02));
  }
- 
+ //translate(-width/2, -height/2);
+ wintx = -width/2;
+ winty = -height/2;
 }
 
 function playSound(){
@@ -87,7 +92,7 @@ if(ppos.y - player.boxdims.y < 70) renderOffset.y += constrain(1.04*player.veloc
 /*
 Rendering
 */
-
+//translate(wintx, winty);
   background(51);
   image(backg, 0, 0);
   system.origin = player.position.copy();
@@ -97,7 +102,7 @@ Rendering
   
   color(255,255,255,255);
   stroke(255,255,255);
-  text(url, 100, 100);
+  //text(url, 100, 100);
   entity_system.render();
 }
 
@@ -374,7 +379,7 @@ let Particle = function(position) {
   this.velocity = createVector(random(-1, 1), random(-1, 0));
   this.position = position.copy();
   this.position.add(renderOffset);
-  this.lifespan = 1024;
+  this.lifespan = 255;
 };
 
 Particle.prototype.run = function() {
