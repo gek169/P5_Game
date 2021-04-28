@@ -97,8 +97,8 @@ Game_Entity.prototype.integrate = function(){
 		this.velocity.normalize(); this.velocity.mult(player_max_vel);
 	} else {
 		this.velocity.add(this.accel);
-		while(this.velocity.magSq() > entity_max_vel){
-			this.velocity.mult(0.9);
+		if(this.velocity.magSq() > entity_max_vel){
+			this.velocity.normalize(); this.velocity.mult(entity_max_vel);
 		}
 	}
 	this.position.add(this.velocity);
