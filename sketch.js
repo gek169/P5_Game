@@ -49,7 +49,7 @@ function setup() {
   						10.0, 40.0, 0.0, 0.94, aball, 40,40,0,0,1);
 
   entity_system.addEntity(createVector(200,100), 
-    						5.0, 30.0, 0.0, 0.99, aball, 30,30,0,10,0);
+    						5.0, 30.0, 0.0, 0.995, aball, 30,30,0,10,0);
 }
 
 function playSound(){
@@ -110,15 +110,14 @@ Game_Entity.prototype.integrate = function(){
 		if(this.velocity.magSq() > player_max_vel * player_max_vel){
 			this.velocity.normalize(); this.velocity.mult(player_max_vel);
 		}
-		
 	} else {
 		this.velocity.add(this.accel);
 		if(this.velocity.magSq() > entity_max_vel * entity_max_vel){
 			this.velocity.normalize(); this.velocity.mult(entity_max_vel);
 		}
 	}
-	this.velocity.mult(this.friction); //simulate a LOT of friction.
 	this.position.add(this.velocity);
+	this.velocity.mult(this.friction);
 };
 
 Game_Entity.prototype.render = function(){
@@ -159,6 +158,7 @@ Game_Entity.prototype.collide = function(other){
 			this.position.add(vec2);
 			//TODO: collision restitution.
 			vec2.mult(0.5);
+			vec2.mult(other.friction * this.friction);
 			this.velocity.add(vec2);
 		}
 		if(other.mass > 0){
@@ -168,6 +168,7 @@ Game_Entity.prototype.collide = function(other){
 			other.position.add(vec2);
 			//TODO: collision restitution.
 			vec2.mult(0.5);
+			vec2.mult(other.friction * this.friction);
 			other.velocity.add(vec2);
 		}
 	}
