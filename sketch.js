@@ -4,17 +4,19 @@ let cnv;
 let url;
 let backg;
 let aball;
+let ahead1;
 let player;
 let entity_system;
 let renderOffset;
 const entity_max_vel = 500;
 const player_max_vel = 4;
-const debug_render_col = 1;
+const debug_render_col = 0;
 
 function preload(){
 	soundeffect = loadSound('assets/click.wav');
 	backg = loadImage('assets/texture16.png');
 	aball = loadImage('assets/aball.png');
+	ahead1 = loadImage('assets/Army_Head_1.png');
 }
 
 function prepImage(){
@@ -46,10 +48,14 @@ function setup() {
   prepImage();
   entity_system = new ESystem();
   entity_system.addEntity(createVector(100,100), 
-  						10.0, 40.0, 0.0, 0.94, aball, 40,40,0,0,1);
-
-  entity_system.addEntity(createVector(200,100), 
-    						5.0, 30.0, 30.0, 0.995, aball, 30,30,0,10,0);
+  						10.0, 40.0, 40.0, 0.94, ahead1, 40,40,0,0,1);
+  player = entity_system.entities[0];
+ for(let i = 0; i < 100; i++){
+  entity_system.addEntity(createVector(random(10,width-10),random(10,height-10)),
+    						random(0.1,0.8), 10.0, 0.0, random(0.99, 1.0), aball, 10,10,0,3,0);
+  entity_system.entities[entity_system.entities.length-1].accel = createVector(0,
+  	-random(0.001, 0.02));
+ }
 }
 
 function playSound(){
@@ -60,15 +66,31 @@ function draw() {
 Game Logic
 */
 entity_system.integrate();
+for(let i = 1; i < entity_system.entities.length; i++){
+	let ent = entity_system.entities[i];
+	if(ent.position.y - renderOffset.y < 0 || !((ent.position.x-renderOffset.x) < width+20 && (ent.position.x-renderOffset.x) > -20)){
+		ent.position.x = random(10 + renderOffset.x,    width-10+ renderOffset.x);
+		ent.position.y = height + 20.0+ renderOffset.y;
+		ent.friction = random(0.99, 1.0);
+		ent.accel = createVector(0,
+		  	-random(0.001, 0.02));
+	}
+}
+let ppos = player.position.copy();
+ppos.sub(renderOffset);
+if(ppos.x + player.boxdims.x > width-70) renderOffset.x += constrain(1.01*player.velocity.x,1,player_max_vel);
+if(ppos.x - player.boxdims.x < 70) renderOffset.x += constrain(1.01*player.velocity.x,-player_max_vel,-1);
 
+if(ppos.y + player.boxdims.y > height-70) renderOffset.y += constrain(1.01*player.velocity.y,1,player_max_vel);
+if(ppos.y - player.boxdims.y < 70) renderOffset.y += constrain(1.01*player.velocity.y,-player_max_vel,-1);
 /*
 Rendering
 */
 
   background(51);
   image(backg, 0, 0);
-  system.addParticle();
-  system.run();
+  //system.addParticle();
+  //system.run();
   
   color(255,255,255,255);
   stroke(255,255,255);
