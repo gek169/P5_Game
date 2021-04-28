@@ -46,10 +46,10 @@ function setup() {
   prepImage();
   entity_system = new ESystem();
   entity_system.addEntity(createVector(100,100), 
-  						10.0, 40.0, aball, 40,40,0,0,1);
+  						10.0, 40.0, 0.0, aball, 40,40,0,0,1);
 
   entity_system.addEntity(createVector(200,100), 
-    						5.0, 30.0, aball, 30,30,0,0,0);
+    						5.0, 30.0, 0.0, aball, 30,30,0,10,0);
 }
 
 function playSound(){
@@ -81,15 +81,17 @@ Rendering
 
 
 //Entity class
-let Game_Entity = function(position, mass, radius, sprite, spritew, spriteh, renderoffx, renderoffy){
+let Game_Entity = function(position, mass, radius, radius2, sprite, spritew, spriteh, renderoffx, renderoffy){
 	this.position = position.copy();
 	this.sprite = sprite;
 	this.velocity = createVector(0,0);
 	this.accel = createVector(0,0);
 	this.mass = mass;
-	this.radius = radius/2;
+	this.boxdims = createVector(radius/2, radius2/2);
 	this.spritew = spritew;
 	this.spriteh = spriteh;
+	this.renderoffx = renderoffx;
+	this.renderoffy = renderoffy;
 	this.isPlayer = 0;
 };
 
@@ -116,21 +118,29 @@ Game_Entity.prototype.render = function(){
 	let rpos = this.position.copy();
 	rpos.sub(renderOffset);
 	
-	image(this.sprite, rpos.x - this.spritew/2, rpos.y - this.spriteh/2, this.spritew, this.spriteh);
+	image(this.sprite, rpos.x + this.renderoffx - this.spritew/2, rpos.y  + this.renderoffy - this.spriteh/2, this.spritew, this.spriteh);
 	noStroke();
 	fill(255,255,0,100);
 	if(debug_render_col)
-		ellipse(rpos.x, rpos.y, this.radius*2, this.radius*2);
+		if(this.boxdims.y == 0)
+			ellipse(rpos.x, rpos.y, this.boxdims.x*2, this.boxdims.x*2);
+		else
+			ellipse(rpos.x, rpos.y, this.boxdims.x*2, this.boxdims.y*2);
 };
 
 Game_Entity.prototype.collide = function(other){
 	if(this.mass <= 0 && other.mass <= 0) return 0; //Static objects do not need to be processed together.
-	let vec = other.position.copy();
-	vec.sub(this.position);
-	let sqmag = vec.mag();
-	let sumradii = (other.radius + this.radius) - sqmag;
-	if(sumradii > 0.0 && sqmag > 0){
-		vec.mult(sumradii/sqmag);
+	let vec; let diff;
+	if(this.boxdims.y == 0 && other.boxdims.y == 0){ //CircVCirc
+		vec = other.position.copy();
+		vec.sub(this.position);
+		let sqmag = vec.mag();
+		diff = (other.boxdims.x + this.boxdims.x) - sqmag;
+		vec.mult(diff/sqmag); //Get penetration vector.
+	} else if(this.boxdims.y > 0 && other.boxdims.y > 0){ //BoxvBox
+		
+	}
+	if(diff  > 0){
 		let mass_total = this.mass + other.mass;
 		let mass_ratio_me = this.mass / mass_total;
 		let mass_ratio_them = other.mass / mass_total;
@@ -161,8 +171,8 @@ let ESystem = function(){
 	this.entities = [];
 };
 
-ESystem.prototype.addEntity = function(position, mass, radius, sprite, spritew, spriteh, renderoffx, renderoffy, isPlayer){
-	this.entities.push(new Game_Entity(position, mass, radius, sprite, spritew, spriteh, renderoffx, renderoffy))
+ESystem.prototype.addEntity = function(position, mass, radius, radius2, sprite, spritew, spriteh, renderoffx, renderoffy, isPlayer){
+	this.entities.push(new Game_Entity(position, mass, radius, radius2, sprite, spritew, spriteh, renderoffx, renderoffy))
 	this.entities[this.entities.length - 1].isPlayer = isPlayer;
 };
 
