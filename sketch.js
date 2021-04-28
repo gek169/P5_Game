@@ -49,7 +49,7 @@ function setup() {
   						10.0, 40.0, 0.0, 0.94, aball, 40,40,0,0,1);
 
   entity_system.addEntity(createVector(200,100), 
-    						5.0, 30.0, 0.0, 0.995, aball, 30,30,0,10,0);
+    						5.0, 30.0, 30.0, 0.995, aball, 30,30,0,10,0);
 }
 
 function playSound(){
@@ -131,12 +131,14 @@ Game_Entity.prototype.render = function(){
 		if(this.boxdims.y == 0)
 			ellipse(rpos.x, rpos.y, this.boxdims.x*2, this.boxdims.x*2);
 		else
-			ellipse(rpos.x, rpos.y, this.boxdims.x*2, this.boxdims.y*2);
+			rect(rpos.x - this.boxdims.x, rpos.y - this.boxdims.y, this.boxdims.x*2, this.boxdims.y*2);
 };
 
 Game_Entity.prototype.collide = function(other){
 	if(this.mass <= 0 && other.mass <= 0) return 0; //Static objects do not need to be processed together.
-	let vec; let diff;
+	let vec = createVector(0,0); let diff = 0; //penetration vector, penetration depth.
+	let isBoxVCirc = 0; 
+	let box; let circ;
 	if(this.boxdims.y == 0 && other.boxdims.y == 0){ //CircVCirc
 		vec = other.position.copy();
 		vec.sub(this.position);
@@ -144,8 +146,130 @@ Game_Entity.prototype.collide = function(other){
 		diff = (other.boxdims.x + this.boxdims.x) - sqmag;
 		vec.mult(diff/sqmag); //Get penetration vector.
 	} else if(this.boxdims.y > 0 && other.boxdims.y > 0){ //BoxvBox
-		
+		let sumextents = this.boxdims.copy();
+		sumextents.add(other.boxdims);
+		let b1c = this.position;
+		let b2c = other.position;
+		let b1min = b1c.copy();
+			b1min.sub(this.boxdims);
+		let b1max = b1c.copy();
+			b1max.add(this.boxdims);
+		let b2min = b2c.copy();
+			b2min.sub(other.boxdims);
+		let b2max = b2c.copy();
+			b2max.add(other.boxdims);
+		if(
+			!(
+				(Math.abs(b1c.x - b2c.x) <= sumextents.x) &&
+				(Math.abs(b1c.y - b2c.y) <= sumextents.y)
+			)	
+		) {diff = 0;} else {
+			let axispen = []; let bruh;
+			axispen.push(b1max.copy());
+			axispen[0].sub(b2min);
+			axispen.push(b1min.copy());
+			axispen[1].sub(b2max);
+			/*Find the minimum separating access. Let's assume it's the first one...*/
+			vec.x = axispen[0].x;  vec.y = 0;
+			diff = Math.abs(axispen[0].x);
+			bruh = Math.abs(axispen[0].y);
+			if(bruh < diff){
+				vec.x = 0;
+				vec.y = axispen[0].y;
+				diff = bruh;
+			}
+			bruh = Math.abs(axispen[1].y);
+			if(bruh < diff){
+				vec.x = 0;
+				vec.y = axispen[1].y;
+				diff = bruh;
+			}
+			bruh = Math.abs(axispen[1].x);
+			if(bruh < diff){
+				vec.y = 0;
+				vec.x = axispen[1].x;
+				diff = bruh;
+			}
+		}
+	} else if(this.boxdims.y > 0 && other.boxdims.y <= 0){ //We are a box, they are a circle.
+		box = this;
+		circ = other;
+		isBoxVCirc = 1;
+	} else {
+		box = other;
+		circ = this;
+		isBoxVCirc = 2;
 	}
+	if(isBoxVCirc){//collision between box and circle
+		let p = circ.position.copy(); //
+		{ //function: closest point AABB
+			let b1c = box.position.copy();
+			let b1min = b1c.copy();
+				b1min.sub(box.boxdims);
+			let b1max = b1c.copy();
+				b1max.add(box.boxdims);
+			p.x = constrain(p.x, b1min.x, b1max.x);
+			p.y = constrain(p.y, b1min.y, b1max.y);
+		}
+		let v = p.copy(); v.sub(circ.position);
+		let d2 = v.magSq();
+		if(d2 <= circ.boxdims.x * circ.boxdims.x){
+			let len = v.mag();
+			let local_diff = circ.boxdims.x - len;
+			if(len > 0){
+				diff = local_diff;
+				vec = v.copy(); vec.mult(diff/len);
+				if(isBoxVCirc != 2)
+					vec.mult(-1);
+			} else {
+				let sumextents = this.boxdims.copy();
+				sumextents.add(other.boxdims);
+				let b1c = this.position;
+				let b2c = other.position;
+				let b1min = b1c.copy();
+					b1min.sub(this.boxdims);
+				let b1max = b1c.copy();
+					b1max.add(this.boxdims);
+				let b2min = b2c.copy();
+					b2min.sub(other.boxdims);
+				let b2max = b2c.copy();
+					b2max.add(other.boxdims);
+				if(
+					!(
+						(Math.abs(b1c.x - b2c.x) <= sumextents.x) &&
+						(Math.abs(b1c.y - b2c.y) <= sumextents.y)
+					)	
+				) {diff = 0;} else {
+					let axispen = []; let bruh;
+					axispen.push(b1max.copy());
+					axispen[0].sub(b2min);
+					axispen.push(b1min.copy());
+					axispen[1].sub(b2max);
+					/*Find the minimum separating access. Let's assume it's the first one...*/
+					vec.x = axispen[0].x;  vec.y = 0;
+					diff = Math.abs(axispen[0].x);
+					bruh = Math.abs(axispen[0].y);
+					if(bruh < diff){
+						vec.x = 0;
+						vec.y = axispen[0].y;
+						diff = bruh;
+					}
+					bruh = Math.abs(axispen[1].y);
+					if(bruh < diff){
+						vec.x = 0;
+						vec.y = axispen[1].y;
+						diff = bruh;
+					}
+					bruh = Math.abs(axispen[1].x);
+					if(bruh < diff){
+						vec.y = 0;
+						vec.x = axispen[1].x;
+						diff = bruh;
+					}
+				}
+			}//EOF boxvbox subcase
+		}//if(d2 <= circ.boxdims.x * circ.boxdims.x){}
+	} //if(isBoxVCirc){}
 	if(diff  > 0){
 		let mass_total = this.mass + other.mass;
 		let mass_ratio_me = this.mass / mass_total;
