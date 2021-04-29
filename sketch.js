@@ -79,6 +79,8 @@ function setup() {
   player.render = player_render;
   entity_system.addEntity(createVector(200,100), 
       						10.0, 40.0, 40.0, 0.94, ahead1, 40,40,0,0,0);
+	entity_system.addEntity(createVector(280,100), 
+      						0.0, 100.0, 100.0, 0.94, ahead1, 100,100,0,0,0);
   entity_system.addEntity(createVector(200,200),
         						100.0, 80.0, 0.0, 0.94, aball, 80,80,0,0,0);
  for(let i = 0; i < 350; i++){
