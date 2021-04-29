@@ -6,6 +6,7 @@ let backg;
 let aball;
 let ahead1;
 let player;
+let player_anim_frames = [];
 let entity_system;
 let renderOffset;
 const entity_max_vel = 500;
@@ -18,6 +19,18 @@ function preload(){
 	backg = loadImage('assets/texture16.png');
 	aball = loadImage('assets/aball.png');
 	ahead1 = loadImage('assets/Army_Head_1.png');
+	player_anim_frames.push(
+		loadImage('assets/player_move_1.png')
+	);
+	player_anim_frames.push(
+		loadImage('assets/player_move_2.png')
+	);
+	player_anim_frames.push(
+		loadImage('assets/player_move_3.png')
+	);
+	player_anim_frames.push(
+		loadImage('assets/player_move_2.png')
+	);
 }
 
 function prepImage(){
@@ -53,6 +66,10 @@ function setup() {
   entity_system.addEntity(createVector(100,100), 
   						10.0, 40.0, 40.0, 0.94, ahead1, 40,40,0,0,1);
   player = entity_system.entities[0];
+  
+  player.isPlayingAnim = 0; player.framesOnCurrentAnim = 0;
+  player.currentAnimFrame = 0;
+  player.render = player_render;
  for(let i = 0; i < 350; i++){
   entity_system.addEntity(createVector(random(10,width-10),random(10,height-10)),
     						random(0.1,0.8), 10.0, 0.0, random(0.99, 1.0), aball, 10,10,0,3,0);
@@ -62,6 +79,26 @@ function setup() {
  //translate(-width/2, -height/2);
  wintx = -width/2;
  winty = -height/2;
+}
+
+
+
+function player_render(){
+	if(this.velocity.magSq() > (player_max_vel * player_max_vel)/2.0){
+		if(!this.isPlayingAnim){this.isPlayingAnim = 1; this.currentAnimFrame = 0;}
+		else{
+			this.framesOnCurrentAnim += 1;
+			if(this.framesOnCurrentAnim > 6)
+				{this.currentAnimFrame++;this.framesOnCurrentAnim = 0;}
+			this.currentAnimFrame %= player_anim_frames.length;
+			this.sprite = player_anim_frames[this.currentAnimFrame];
+		}
+	} else {
+		this.sprite = player_anim_frames[0];
+		this.currentAnimFrame = 0;
+		this.framesOnCurrentAnim = 6;
+	}
+	this.render_internal();
 }
 
 function playSound(){
@@ -110,6 +147,7 @@ Rendering
 
 
 
+
 //Entity class
 let Game_Entity = function(position, mass, radius, radius2, friction, sprite, spritew, spriteh, renderoffx, renderoffy){
 	this.position = position.copy();
@@ -151,20 +189,15 @@ Game_Entity.prototype.integrate = function(){
 	this.velocity.mult(this.friction);
 };
 
-Game_Entity.prototype.render = function(){
+Game_Entity.prototype.render_internal = function(){
 	let rpos = this.position.copy();
 	rpos.sub(renderOffset);
 	image(this.sprite, rpos.x + this.renderoffx - this.spritew/2, rpos.y  + this.renderoffy - this.spriteh/2, this.spritew, this.spriteh);
 	noStroke();
 	fill(255,255,0,100);
-	/*
-	if(debug_render_col)
-		if(this.boxdims.y == 0)
-			ellipse(rpos.x, rpos.y, this.boxdims.x*2, this.boxdims.x*2);
-		else
-			rect(rpos.x - this.boxdims.x, rpos.y - this.boxdims.y, this.boxdims.x*2, this.boxdims.y*2);
-	*/
-};
+}
+
+Game_Entity.prototype.render = Game_Entity.prototype.render_internal;
 
 Game_Entity.prototype.collide = function(other){
 	if(this.mass <= 0 && other.mass <= 0) return 0; //Static objects do not need to be processed together.
