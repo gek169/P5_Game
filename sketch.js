@@ -63,17 +63,28 @@ function setup() {
   frameRate(60);
   prepImage();
   entity_system = new ESystem();
-  entity_system.addEntity(createVector(100,100), 
-  						10.0, 40.0, 40.0, 0.94, ahead1, 40,40,0,0,1);
+  entity_system.addEntity(
+  					createVector(100,100),  //initial position
+  						10.0,  //mass
+  						30.0, 0.0, //radius1, radius2. if radius2 is zero, this is a sphere.
+  						0.94,  //friction- 1=no friction, 0=no sliding
+  						ahead1, //sprite
+  						40,40, //spritew, spriteh
+  						0,-1, //render offsets
+  						1//isPlayer
+  						);
   player = entity_system.entities[0];
   
-  player.isPlayingAnim = 0; player.framesOnCurrentAnim = 0;
   player.currentAnimFrame = 0;
   player.render = player_render;
+  entity_system.addEntity(createVector(200,100), 
+      						10.0, 40.0, 40.0, 0.94, ahead1, 40,40,0,0,0);
+  entity_system.addEntity(createVector(200,200),
+        						100.0, 80.0, 0.0, 0.94, aball, 80,80,0,0,0);
  for(let i = 0; i < 350; i++){
-  entity_system.addEntity(createVector(random(10,width-10),random(10,height-10)),
-    						random(0.1,0.8), 10.0, 0.0, random(0.99, 1.0), aball, 10,10,0,3,0);
-  entity_system.entities[entity_system.entities.length-1].accel = createVector(0,
+  entity_system.addParticle(createVector(random(10,width-10),random(10,height-10)),
+    						random(0.1,0.8), 10.0, 0.0, random(0.99, 1.0), aball, 10,10,0,0,0);
+  entity_system.particles[entity_system.particles.length-1].accel = createVector(0,
   	-random(0.001, 0.02));
  }
  //translate(-width/2, -height/2);
@@ -84,7 +95,7 @@ function setup() {
 
 
 function player_render(){
-	if(this.velocity.magSq() > (player_max_vel * player_max_vel)/2.0){
+	if(this.velocity.magSq() > (player_max_vel * player_max_vel)/4.0){
 		if(!this.isPlayingAnim){this.isPlayingAnim = 1; this.currentAnimFrame = 0;}
 		else{
 			this.framesOnCurrentAnim += 1;
@@ -109,8 +120,8 @@ function draw() {
 Game Logic
 */
 entity_system.integrate();
-for(let i = 1; i < entity_system.entities.length; i++){
-	let ent = entity_system.entities[i];
+for(let i = 0; i < entity_system.particles.length; i++){
+	let ent = entity_system.particles[i];
 	if(ent.position.y - renderOffset.y < 0 || !((ent.position.x-renderOffset.x) < width+20 && (ent.position.x-renderOffset.x) > -20)){
 		ent.position.x = random(10 + renderOffset.x,    width-10+ renderOffset.x);
 		ent.position.y = height + 20.0+ renderOffset.y;
@@ -201,7 +212,7 @@ Game_Entity.prototype.render = Game_Entity.prototype.render_internal;
 
 Game_Entity.prototype.collide = function(other){
 	if(this.mass <= 0 && other.mass <= 0) return 0; //Static objects do not need to be processed together.
-	if(this.boxdims.x <= 0 || other.boxdims.x <= 0) return 0; //Object with no collision.
+	/*if(this.boxdims.x <= 0 || other.boxdims.x <= 0) return 0;*/ //Object with no collision.
 	let vec = createVector(0,0); let diff = 0; //penetration vector, penetration depth.
 	let isBoxVCirc = 0; 
 	let box; let circ;
@@ -365,6 +376,8 @@ Game_Entity.prototype.collide = function(other){
 
 let ESystem = function(){
 	this.entities = [];
+	this.renderables = [];
+	this.particles = [];
 };
 
 ESystem.prototype.addEntity = function(position, mass, radius, radius2, friction, sprite, spritew, spriteh, renderoffx, renderoffy, isPlayer){
@@ -372,14 +385,33 @@ ESystem.prototype.addEntity = function(position, mass, radius, radius2, friction
 	this.entities[this.entities.length - 1].isPlayer = isPlayer;
 };
 
+ESystem.prototype.addRenderable = function(position, mass, radius, radius2, friction, sprite, spritew, spriteh, renderoffx, renderoffy, isPlayer){
+	this.renderables.push(new Game_Entity(position, mass, radius, radius2, friction, sprite, spritew, spriteh, renderoffx, renderoffy))
+	this.renderables[this.renderables.length - 1].isPlayer = isPlayer;
+};
+
+ESystem.prototype.addParticle = function(position, mass, radius, radius2, friction, sprite, spritew, spriteh, renderoffx, renderoffy, isPlayer){
+	this.particles.push(new Game_Entity(position, mass, radius, radius2, friction, sprite, spritew, spriteh, renderoffx, renderoffy))
+	this.particles[this.particles.length - 1].isPlayer = isPlayer;
+};
+
 ESystem.prototype.removeEntity = function(i){
 	this.entities.splice(i, 1);
-}
+};
+ESystem.prototype.removeRenderable = function(i){
+	this.renderables.splice(i, 1);
+};
+ESystem.prototype.removeParticle = function(i){
+	this.particles.splice(i, 1);
+};
 
 ESystem.prototype.integrate = function(){
 	let i; let j;
 	for(i = this.entities.length - 1; i>-1; i--){
 		this.entities[i].integrate();
+	}
+	for(i = this.particles.length - 1; i>-1; i--){
+		this.particles[i].integrate();
 	}
 	for(i = this.entities.length - 1; i>0; i--){
 		for(j = i-1; j>-1; j--){
@@ -391,8 +423,14 @@ ESystem.prototype.integrate = function(){
 }
 
 ESystem.prototype.render = function(){
+	for(let i = this.renderables.length - 1; i>=0; i--){
+		this.renderables[i].render();
+	}
 	for(let i = this.entities.length - 1; i>=0; i--){
 		this.entities[i].render();
+	}
+	for(let i = this.particles.length - 1; i>=0; i--){
+		this.particles[i].render();
 	}
 }
 
