@@ -87,10 +87,11 @@ function setup() {
       						0
       					);
   entity_system.entities[entity_system.entities.length-1].was_colliding_frames_ago = 0;
-  entity_system.entities[entity_system.entities.length-1].oncollide = function(){
+  entity_system.entities[entity_system.entities.length-1].oncollide = function(other, diff){
+	if(diff > 3)
   	if(this.was_colliding_frames_ago <= 0){
   		playClick();
-  		this.was_colliding_frames_ago = 40;
+  		this.was_colliding_frames_ago = 30;
   	}
   };
   
@@ -229,7 +230,7 @@ Game_Entity.prototype.render_internal = function(){
 Game_Entity.prototype.render = Game_Entity.prototype.render_internal;
 //
 Game_Entity.prototype.behavior = function(){};
-Game_Entity.prototype.oncollide = function(other){};
+Game_Entity.prototype.oncollide = function(other, diff){};
 
 Game_Entity.prototype.collide = function(other){
 	if(this.mass <= 0 && other.mass <= 0) return 0; //Static objects do not need to be processed together.
@@ -372,8 +373,8 @@ Game_Entity.prototype.collide = function(other){
 		let mass_total = this.mass + other.mass;
 		let mass_ratio_me = this.mass / mass_total;
 		let mass_ratio_them = other.mass / mass_total;
-		this.oncollide(other);
-		other.oncollide(this);
+		this.oncollide(other, diff);
+		other.oncollide(this, diff);
 		if(this.mass > 0){
 			let vec2 = vec.copy();
 			vec2.mult(-1);
