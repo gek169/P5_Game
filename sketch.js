@@ -1,5 +1,5 @@
 let system;
-let soundeffect;
+let click_sound;
 let cnv;
 let url;
 let backg;
@@ -15,7 +15,7 @@ const debug_render_col = 0;
 let wintx; let winty;
 
 function preload(){
-	soundeffect = loadSound('assets/click.wav');
+	click_sound = loadSound('assets/click.wav');
 	backg = loadImage('assets/texture16.png');
 	aball = loadImage('assets/aball.png');
 	ahead1 = loadImage('assets/Army_Head_1.png');
@@ -57,7 +57,7 @@ function setup() {
   pixelDensity(1);
   //cnv = createCanvas(640, 480, WEBGL);
   cnv = createCanvas(640, 480);
-  cnv.mousePressed(playSound);
+  cnv.mousePressed(playClick);
   system = new ParticleSystem(createVector(width / 2, 50));
   renderOffset = createVector(0,0);
   frameRate(60);
@@ -79,6 +79,16 @@ function setup() {
   player.render = player_render;
   entity_system.addEntity(createVector(200,100), 
       						10.0, 40.0, 40.0, 0.94, ahead1, 40,40,0,0,0);
+  entity_system.entities[entity_system.entities.length-1].oncollide = function(){
+  	if(this.was_colliding_frames_ago <= 0){
+  		playClick();
+  		this.was_colliding_frames_ago = 40;
+  	}
+  };
+  entity_system.entities[entity_system.entities.length-1].was_colliding_frames_ago = 0;
+  entity_system.entities[entity_system.entities.length-1].behavior = function(){
+  	if(this.was_colliding_frames_ago>0)this.was_colliding_frames_ago--;
+  };
 	entity_system.addEntity(createVector(280,100), 
       						0.0, 100.0, 100.0, 0.94, ahead1, 100,100,0,0,0);
   entity_system.addEntity(createVector(200,200),
@@ -114,9 +124,7 @@ function player_render(){
 	this.render_internal();
 }
 
-function playSound(){
-	soundeffect.play();
-}
+function playClick(){click_sound.play();}
 function draw() {
 /*
 Game Logic
@@ -211,6 +219,9 @@ Game_Entity.prototype.render_internal = function(){
 }
 
 Game_Entity.prototype.render = Game_Entity.prototype.render_internal;
+//
+Game_Entity.prototype.behavior = function(){};
+Game_Entity.prototype.oncollide = function(other){};
 
 Game_Entity.prototype.collide = function(other){
 	if(this.mass <= 0 && other.mass <= 0) return 0; //Static objects do not need to be processed together.
@@ -353,6 +364,8 @@ Game_Entity.prototype.collide = function(other){
 		let mass_total = this.mass + other.mass;
 		let mass_ratio_me = this.mass / mass_total;
 		let mass_ratio_them = other.mass / mass_total;
+		this.oncollide(other);
+		other.oncollide(this);
 		if(this.mass > 0){
 			let vec2 = vec.copy();
 			vec2.mult(-1);
@@ -411,9 +424,11 @@ ESystem.prototype.integrate = function(){
 	let i; let j;
 	for(i = this.entities.length - 1; i>-1; i--){
 		this.entities[i].integrate();
+		this.entities[i].behavior();
 	}
 	for(i = this.particles.length - 1; i>-1; i--){
 		this.particles[i].integrate();
+		this.particles[i].behavior();
 	}
 	for(i = this.entities.length - 1; i>0; i--){
 		for(j = i-1; j>-1; j--){
