@@ -74,18 +74,26 @@ function setup() {
   						1//isPlayer
   						);
   player = entity_system.entities[0];
-  
   player.currentAnimFrame = 0;
   player.render = player_render;
+
   entity_system.addEntity(createVector(200,100), 
-      						10.0, 40.0, 40.0, 0.94, ahead1, 40,40,0,0,0);
+      						10.0, 
+      						40.0, 40.0, 
+      						0.98, 
+      						ahead1, 
+      						40,40,
+      						0,0,
+      						0
+      					);
+  entity_system.entities[entity_system.entities.length-1].was_colliding_frames_ago = 0;
   entity_system.entities[entity_system.entities.length-1].oncollide = function(){
   	if(this.was_colliding_frames_ago <= 0){
   		playClick();
   		this.was_colliding_frames_ago = 40;
   	}
   };
-  entity_system.entities[entity_system.entities.length-1].was_colliding_frames_ago = 0;
+  
   entity_system.entities[entity_system.entities.length-1].behavior = function(){
   	if(this.was_colliding_frames_ago>0)this.was_colliding_frames_ago--;
   };
