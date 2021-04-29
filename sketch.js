@@ -201,6 +201,7 @@ Game_Entity.prototype.render = Game_Entity.prototype.render_internal;
 
 Game_Entity.prototype.collide = function(other){
 	if(this.mass <= 0 && other.mass <= 0) return 0; //Static objects do not need to be processed together.
+	if(this.boxdims.x <= 0 || other.boxdims.x <= 0) return 0; //Object with no collision.
 	let vec = createVector(0,0); let diff = 0; //penetration vector, penetration depth.
 	let isBoxVCirc = 0; 
 	let box; let circ;
