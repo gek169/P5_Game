@@ -60,6 +60,17 @@ function draw() {
 		game_logic();
 	} else {
 		//editor logic goes here. TODO.
+		if(!keyIsDown(SHIFT)){
+			if(keyIsDown(UP_ARROW))	renderOffset.y -= 2.0;
+			if(keyIsDown(RIGHT_ARROW))	renderOffset.x += 2.0;
+			if(keyIsDown(DOWN_ARROW))	renderOffset.y += 2.0;
+			if(keyIsDown(LEFT_ARROW))	renderOffset.x -= 2.0;
+		} else {
+			if(keyIsDown(UP_ARROW))	renderOffset.y -= 10.0;
+			if(keyIsDown(RIGHT_ARROW))	renderOffset.x += 10.0;
+			if(keyIsDown(DOWN_ARROW))	renderOffset.y += 10.0;
+			if(keyIsDown(LEFT_ARROW))	renderOffset.x -= 10.0;
+		}
 	}
 	entity_system.render();
 }
