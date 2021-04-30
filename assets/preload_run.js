@@ -1,6 +1,5 @@
 
-
-console.log("works!");
+{
 
 	assetman = {};
 //SOUNDS
@@ -23,7 +22,7 @@ console.log("works!");
 	assetman.player_anim_frames.push(
 		assetman.player_anim_frames[1]
 	);
-
+}
 
 function prepImage(obj){
 	let bffr = createGraphics(assetman.backg.width, assetman.backg.height);

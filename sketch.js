@@ -1,11 +1,7 @@
 let system;
 let cnv;
 let url;
-
 let entity_system;
-
-
-
 let assetman; //manages assets.
 let player;
 let renderOffset;
@@ -13,11 +9,6 @@ const entity_max_vel = 500;
 const player_max_vel = 4;
 const debug_render_col = 0;
 let wintx; let winty;
-
-function httpGet(theUrl){
-	
-	return xmlHttp.responseText;
-}
 
 function preload(){
 	var xmlHttp = new XMLHttpRequest();
@@ -49,7 +40,11 @@ function draw() {
 
 
 
-
+/*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			Engine code
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*/
 
 
 //Entity class
@@ -321,9 +316,7 @@ ESystem.prototype.integrate = function(){
 		}
 	}
 }
-
 ESystem.prototype.render_background = function(){}
-
 ESystem.prototype.render = function(){
 	this.render_background();
 	for(let i = this.renderables.length - 1; i>=0; i--){
@@ -336,6 +329,11 @@ ESystem.prototype.render = function(){
 		this.particles[i].render();
 	}
 }
+
+
+
+
+
 
 
 
