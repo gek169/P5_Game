@@ -42,25 +42,29 @@ function prepImage(obj){
 	bffr = 0; //explicit destruction.
 }
 
+
+
+
+
 function setup_hook(){
   pixelDensity(1);
   cnv = createCanvas(1024, 768);
-  cnv.mousePressed(playClick);
+  //cnv.mousePressed(playClick);
   //system = new ParticleSystem(createVector(width / 2, 50));
   renderOffset = createVector(0,0);
   frameRate(60);
   prepImage();
   entity_system = new ESystem();
-  entity_system.backg = assetman.backg; assetman.backg=0;
+  global_vars.backg = assetman.backg; assetman.backg=0;
   entity_system.render_background = function(){
   	  	background(51);
-  		image(this.backg, 0, 0);
+  		image(global_vars.backg, 0, 0);
   }
   entity_system.addEntity(
   					createVector(100,100),  //initial position
   						10.0,  //mass
   						30.0, 0.0, //radius1, radius2. if radius2 is zero, this is a sphere.
-  						0.94,  //friction- 1=no friction, 0=no sliding
+  						0.94,  //friction- 1=no friction, 0=velocity immediately drops to zero.
   						assetman.ahead1, //sprite
   						40,40, //spritew, spriteh
   						0,-1, //render offsets
@@ -93,7 +97,7 @@ function setup_hook(){
       						0.0, 100.0, 100.0, 0.94, assetman.ahead1, 100,100,0,0,0);
   entity_system.addEntity(createVector(200,200),
         						100.0, 80.0, 0.0, 0.94, assetman.aball, 80,80,0,0,0);
- for(let i = 0; i < 350; i++){
+ for(let i = 0; i < 2000; i++){
   entity_system.addParticle(createVector(random(10,width-10),random(10,height-10)),
     						random(0.1,0.8), 10.0, 0.0, random(0.99, 1.0), assetman.aball, 10,10,0,0,0);
   entity_system.particles[entity_system.particles.length-1].accel = createVector(0,

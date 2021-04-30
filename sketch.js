@@ -5,6 +5,9 @@ let assetman; //manages assets.
 let global_vars; //global variables.
 let player;
 let renderOffset;
+let renderOffsetSaved_Gameplay; //when switch between modes, the render offset may be changed.
+let renderOffsetSaved_Editor; //when switch between modes
+let editor_is_active = false;
 const entity_max_vel = 500;
 const player_max_vel = 4;
 const debug_render_col = 0;
@@ -18,6 +21,25 @@ function get_and_run(theURL){
 	e(xmlHttp.responseText);
 }
 
+$("#exportLvlBtn").click(function(){
+	$("#exportLvlTxt").val( $("#exportLvlTxt").val() + "Works!\n");
+});
+
+
+$("#toggleEditorBtn").click(function(){
+	editor_is_active = !editor_is_active;
+	if(editor_is_active){
+		$("#modename").text("Editing");
+		//Save the position of the screen.
+		renderOffsetSaved_Gameplay = renderOffset;
+		renderOffset = renderOffsetSaved_Editor;
+	} else {
+		$("#modename").text("Gameplay");
+		renderOffsetSaved_Editor = renderOffset;
+		renderOffset = renderOffsetSaved_Gameplay;
+	}
+});
+
 function preload(){
 	get_and_run('assets/preload_run.js');
 }
@@ -26,13 +48,19 @@ function preload(){
 
 function setup() {
   url = getURL();
+  renderOffsetSaved_Editor = createVector(0,0);
+  renderOffsetSaved_Gameplay = createVector(0,0);
   setup_hook();
 }
 
 
 function draw() {
-	entity_system.integrate();
-	game_logic();
+	if(!editor_is_active){
+		entity_system.integrate();
+		game_logic();
+	} else {
+		//editor logic goes here.
+	}
 	entity_system.render();
 }
 
@@ -273,16 +301,22 @@ let ESystem = function(){
 	this.entities = [];
 	this.renderables = [];
 	this.particles = [];
+	this.fgrenderables = [];
 };
 
 ESystem.prototype.addEntity = function(position, mass, radius, radius2, friction, sprite, spritew, spriteh, renderoffx, renderoffy, isPlayer){
-	this.entities.push(new Game_Entity(position, mass, radius, radius2, friction, sprite, spritew, spriteh, renderoffx, renderoffy))
+	this.entities.push(new Game_Entity(position, mass, radius, radius2, friction, sprite, spritew, spriteh, renderoffx, renderoffy));
 	this.entities[this.entities.length - 1].isPlayer = isPlayer;
 };
 
 ESystem.prototype.addRenderable = function(position, mass, radius, radius2, friction, sprite, spritew, spriteh, renderoffx, renderoffy, isPlayer){
-	this.renderables.push(new Game_Entity(position, mass, radius, radius2, friction, sprite, spritew, spriteh, renderoffx, renderoffy))
+	this.renderables.push(new Game_Entity(position, mass, radius, radius2, friction, sprite, spritew, spriteh, renderoffx, renderoffy));
 	this.renderables[this.renderables.length - 1].isPlayer = isPlayer;
+};
+
+ESystem.prototype.addFgRenderable = function(position, mass, radius, radius2, friction, sprite, spritew, spriteh, renderoffx, renderoffy, isPlayer){
+	this.fgrenderables.push(new Game_Entity(position, mass, radius, radius2, friction, sprite, spritew, spriteh, renderoffx, renderoffy));
+	this.fgrenderables[this.renderables.length - 1].isPlayer = isPlayer;
 };
 
 ESystem.prototype.addParticle = function(position, mass, radius, radius2, friction, sprite, spritew, spriteh, renderoffx, renderoffy, isPlayer){
@@ -329,5 +363,8 @@ ESystem.prototype.render = function(){
 	}
 	for(let i = this.particles.length - 1; i>=0; i--){
 		this.particles[i].render();
+	}
+	for(let i = this.fgrenderables.length - 1; i>=0; i--){
+		this.fgrenderables[i].render();
 	}
 }
