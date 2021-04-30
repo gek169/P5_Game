@@ -2,7 +2,6 @@ let system;
 let click_sound;
 let cnv;
 let url;
-let backg;
 let aball;
 let ahead1;
 let player;
@@ -13,13 +12,14 @@ const entity_max_vel = 500;
 const player_max_vel = 4;
 const debug_render_col = 0;
 let wintx; let winty;
-
-
 function preload(){
+	//SOUNDS
 	click_sound = loadSound('assets/click.wav');
+	//IMAGES
 	backg = loadImage('assets/texture16.png');
 	aball = loadImage('assets/aball.png');
 	ahead1 = loadImage('assets/Army_Head_1.png');
+	//ANIMATIONS
 	player_anim_frames.push(
 		loadImage('assets/player_move_1.png')
 	);
@@ -34,7 +34,7 @@ function preload(){
 	);
 }
 
-function prepImage(){
+function prepImage(obj){
 	let bffr = createGraphics(backg.width, backg.height);
 	//bffr.pixelDensity(1);
 	bffr.background(101);
@@ -60,11 +60,16 @@ function setup() {
   //cnv = createCanvas(640, 480, WEBGL);
   cnv = createCanvas(640, 480);
   cnv.mousePressed(playClick);
-  system = new ParticleSystem(createVector(width / 2, 50));
+  //system = new ParticleSystem(createVector(width / 2, 50));
   renderOffset = createVector(0,0);
   frameRate(60);
   prepImage();
   entity_system = new ESystem();
+  entity_system.backg = backg; backg=0;
+  entity_system.render_background = function(){
+  	  	background(51);
+  		image(this.backg, 0, 0);
+  }
   entity_system.addEntity(
   					createVector(100,100),  //initial position
   						10.0,  //mass
@@ -120,6 +125,7 @@ function setup_player(obj){
   player.render = player_render;
   player.behavior = player_behavior;
   player.framesOnCurrentAnim = 6;
+  player.movement_anim_frames = player_anim_frames; player_anim_frames = 0;
 }
 function player_behavior(){
 	let ppos = this.position.copy();
@@ -137,11 +143,11 @@ function player_render(){
 			this.framesOnCurrentAnim += 1;
 			if(this.framesOnCurrentAnim > 6)
 				{this.currentAnimFrame++;this.framesOnCurrentAnim = 0;}
-			this.currentAnimFrame %= player_anim_frames.length;
-			this.sprite = player_anim_frames[this.currentAnimFrame];
+			this.currentAnimFrame %= this.movement_anim_frames.length;
+			this.sprite = this.movement_anim_frames[this.currentAnimFrame];
 		}
 	} else {
-		this.sprite = player_anim_frames[0];
+		this.sprite = this.movement_anim_frames[0];
 		this.currentAnimFrame = 0;
 		this.framesOnCurrentAnim = 6;
 	}
@@ -169,8 +175,7 @@ for(let i = 0; i < entity_system.particles.length; i++){
 Rendering
 */
 //translate(wintx, winty);
-  background(51);
-  image(backg, 0, 0);
+
   /*
   system.origin = player.position.copy();
   system.origin.sub(renderOffset);
@@ -458,7 +463,10 @@ ESystem.prototype.integrate = function(){
 	}
 }
 
+ESystem.prototype.render_background = function(){}
+
 ESystem.prototype.render = function(){
+	this.render_background();
 	for(let i = this.renderables.length - 1; i>=0; i--){
 		this.renderables[i].render();
 	}
