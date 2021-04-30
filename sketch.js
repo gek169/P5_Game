@@ -116,7 +116,18 @@ function setup() {
 function setup_player(obj){
   player = obj;
   player.currentAnimFrame = 0;
+  player.isPlayingAnim = 0;
   player.render = player_render;
+  player.behavior = player_behavior;
+  player.framesOnCurrentAnim = 6;
+}
+function player_behavior(){
+	let ppos = this.position.copy();
+	ppos.sub(renderOffset);
+	if(ppos.x + this.boxdims.x > width-70) renderOffset.x += constrain(1.04*this.velocity.x,1,player_max_vel);
+	if(ppos.x - this.boxdims.x < 70) renderOffset.x += constrain(1.04*this.velocity.x,-player_max_vel,-1);
+	if(ppos.y + this.boxdims.y > height-70) renderOffset.y += constrain(1.04*this.velocity.y,1,player_max_vel);
+	if(ppos.y - this.boxdims.y < 70) renderOffset.y += constrain(1.04*this.velocity.y,-player_max_vel,-1);
 }
 
 function player_render(){
@@ -153,13 +164,7 @@ for(let i = 0; i < entity_system.particles.length; i++){
 		  	-random(0.001, 0.02));
 	}
 }
-let ppos = player.position.copy();
-ppos.sub(renderOffset);
-if(ppos.x + player.boxdims.x > width-70) renderOffset.x += constrain(1.04*player.velocity.x,1,player_max_vel);
-if(ppos.x - player.boxdims.x < 70) renderOffset.x += constrain(1.04*player.velocity.x,-player_max_vel,-1);
 
-if(ppos.y + player.boxdims.y > height-70) renderOffset.y += constrain(1.04*player.velocity.y,1,player_max_vel);
-if(ppos.y - player.boxdims.y < 70) renderOffset.y += constrain(1.04*player.velocity.y,-player_max_vel,-1);
 /*
 Rendering
 */
