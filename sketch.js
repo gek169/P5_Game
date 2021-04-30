@@ -59,7 +59,7 @@ function draw() {
 		entity_system.integrate();
 		game_logic();
 	} else {
-		//editor logic goes here.
+		//editor logic goes here. TODO.
 	}
 	entity_system.render();
 }
