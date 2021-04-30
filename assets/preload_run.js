@@ -1,5 +1,5 @@
 {
-	cnv = {}; player = {}; renderOffset = {}; assetman = {}; //explicitly delete anything that existed before us.
+	global_vars = {}; cnv = {}; player = {}; renderOffset = {}; assetman = {}; //explicitly delete anything that existed before us.
 //SOUNDS
 	assetman.click_sound = loadSound('assets/click.wav');
 	//IMAGES
@@ -114,7 +114,6 @@ function game_logic(){
 		}
 	}
 }
-
 
 function playClick(){assetman.click_sound.play();}
 

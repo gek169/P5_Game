@@ -2,6 +2,7 @@ let cnv;
 let url;
 let entity_system;
 let assetman; //manages assets.
+let global_vars; //global variables.
 let player;
 let renderOffset;
 const entity_max_vel = 500;
