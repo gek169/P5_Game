@@ -3,14 +3,15 @@ let url;
 let entity_system;
 let assetman; //manages assets.
 let global_vars; //global variables.
+let selected_layer = 0; //Renderables.
 let player;
+let selectedEntity;
 let renderOffset;
 let renderOffsetSaved_Gameplay; //when switch between modes, the render offset may be changed.
 let renderOffsetSaved_Editor; //when switch between modes
 let editor_is_active = false;
 const entity_max_vel = 500;
 const player_max_vel = 4;
-const debug_render_col = 0;
 let wintx; let winty;
 
 function get_and_run(theURL){
@@ -26,6 +27,20 @@ $("#exportLvlBtn").click(function(){
 });
 
 
+$("#changeInteractTypeBtn").click(function(){
+	if(!editor_is_active) return;
+	selected_layer++; selected_layer%=4; //renderables, entities, particles, fgrenderables.
+	selectedEntity = {};
+	if(selected_layer == 0)
+		$("#interact_type").text("Renderables");
+	else if(selected_layer == 1)
+		$("#interact_type").text("Entities");
+	else if(selected_layer == 2)
+		$("#interact_type").text("Particles");
+	else if(selected_layer == 3)
+		$("#interact_type").text("Foreground Renderables");
+});
+
 $("#toggleEditorBtn").click(function(){
 	editor_is_active = !editor_is_active;
 	if(editor_is_active){
@@ -33,10 +48,12 @@ $("#toggleEditorBtn").click(function(){
 		//Save the position of the screen.
 		renderOffsetSaved_Gameplay = renderOffset;
 		renderOffset = renderOffsetSaved_Editor;
+		selectedEntity = {};
 	} else {
 		$("#modename").text("Gameplay");
 		renderOffsetSaved_Editor = renderOffset;
 		renderOffset = renderOffsetSaved_Gameplay;
+		selectedEntity = {};
 	}
 });
 
@@ -47,10 +64,54 @@ function preload(){
 
 
 function setup() {
-  url = getURL();
-  renderOffsetSaved_Editor = createVector(0,0);
-  renderOffsetSaved_Gameplay = createVector(0,0);
-  setup_hook();
+	url = getURL();
+	selectedEntity = {};
+	renderOffsetSaved_Editor = createVector(0,0);
+	renderOffsetSaved_Gameplay = createVector(0,0);
+	setup_hook();
+	cnv.mousePressed(engine_onclick);
+}
+
+function engine_onclick(){
+	if(!editor_is_active)
+	{
+		onclick_hook();
+	}
+	else {
+		let active_array;
+		if(selected_layer == 0)
+			active_array = entity_system.renderables;
+		else if(selected_layer == 1)
+			active_array = entity_system.entities;
+		else if(selected_layer == 2)
+			active_array = entity_system.particles;
+		else if(selected_layer == 3)
+			active_array = entity_system.fgrenderables;
+		for(let i = 0; i < active_array.length; i++){
+			let active_elem = active_array[i];
+			let screen_pos = active_elem.position.copy();
+			screen_pos.sub(renderOffset);
+			if(active_elem.boxdims.y > 0){
+				if(
+					mouseX < screen_pos.x + active_elem.boxdims.x &&
+					mouseX > screen_pos.x - active_elem.boxdims.x &&
+					mouseY < screen_pos.y + active_elem.boxdims.y &&
+					mouseY > screen_pos.y - active_elem.boxdims.y
+				){
+					selectedEntity = active_elem;
+				}
+			} else {
+				if(
+					mouseX < screen_pos.x + active_elem.boxdims.x &&
+					mouseX > screen_pos.x - active_elem.boxdims.x &&
+					mouseY < screen_pos.y + active_elem.boxdims.x &&
+					mouseY > screen_pos.y - active_elem.boxdims.x
+				){
+					selectedEntity = active_elem;
+				}
+			}
+		}
+	}
 }
 
 
@@ -114,12 +175,25 @@ Game_Entity.prototype.integrate = function(){
 	this.velocity.mult(this.friction);
 };
 
+Game_Entity.prototype.debug_render = function(){
+	noStroke();
+	if(selectedEntity == this)
+		fill(0,255,0,100);
+	else
+		fill(255,255,0,100);
+	{rectMode(CENTER);
+		if(this.boxdims.y <= 0)
+			ellipse(this.position.x - renderOffset.x, this.position.y - renderOffset.y, this.boxdims.x*2, this.boxdims.x*2);
+		else
+			rect(this.position.x - renderOffset.x, this.position.y - renderOffset.y, this.boxdims.x*2, this.boxdims.y*2);
+	}
+}
+
 Game_Entity.prototype.render_internal = function(){
 	let rpos = this.position.copy();
 	rpos.sub(renderOffset);
-	image(this.sprite, rpos.x + this.renderoffx - this.spritew/2, rpos.y  + this.renderoffy - this.spriteh/2, this.spritew, this.spriteh);
-	noStroke();
-	fill(255,255,0,100);
+	if(this.sprite)
+		image(this.sprite, rpos.x + this.renderoffx - this.spritew/2, rpos.y  + this.renderoffy - this.spriteh/2, this.spritew, this.spriteh);
 }
 
 Game_Entity.prototype.render = Game_Entity.prototype.render_internal;
@@ -353,14 +427,26 @@ ESystem.prototype.render = function(){
 	this.render_background();
 	for(let i = this.renderables.length - 1; i>=0; i--){
 		this.renderables[i].render();
+		if((selected_layer == 0) && editor_is_active){
+			this.renderables[i].debug_render();
+		}
 	}
 	for(let i = this.entities.length - 1; i>=0; i--){
 		this.entities[i].render();
+		if((selected_layer == 1) && editor_is_active){
+			this.entities[i].debug_render();
+		}
 	}
 	for(let i = this.particles.length - 1; i>=0; i--){
 		this.particles[i].render();
+		if((selected_layer == 2) && editor_is_active){
+			this.particles[i].debug_render();
+		}
 	}
 	for(let i = this.fgrenderables.length - 1; i>=0; i--){
 		this.fgrenderables[i].render();
+		if((selected_layer == 3) && editor_is_active){
+			this.fgrenderables[i].debug_render();
+		}
 	}
 }

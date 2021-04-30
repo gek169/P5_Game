@@ -44,7 +44,9 @@ function prepImage(obj){
 
 
 
-
+function onclick_hook(){
+	
+}
 
 function setup_hook(){
   pixelDensity(1);
