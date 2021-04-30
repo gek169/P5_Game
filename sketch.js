@@ -87,7 +87,7 @@ function engine_onclick(){
 			active_array = entity_system.particles;
 		else if(selected_layer == 3)
 			active_array = entity_system.fgrenderables;
-		for(let i = 0; i < active_array.length; i++){
+		for(let i = active_array.length-1; i > -1 ; i--){
 			let active_elem = active_array[i];
 			let screen_pos = active_elem.position.copy();
 			screen_pos.sub(renderOffset);
