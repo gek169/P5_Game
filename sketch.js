@@ -94,25 +94,10 @@ let Game_Entity = function(position, mass, radius, radius2, friction, sprite, sp
 };
 
 Game_Entity.prototype.integrate = function(){
-	if(this.isPlayer){
-		let adder = createVector(0,0);
-		this.velocity.mult(0.8); //simulate a LOT of friction.
-		let have_pressed = 0;
-		if(keyIsDown(UP_ARROW)) {adder.y -= 0.9;have_pressed = 1;}
-		if(keyIsDown(DOWN_ARROW)) {adder.y += 0.9;have_pressed = 1;}
-		if(keyIsDown(RIGHT_ARROW)) {adder.x += 0.9;have_pressed = 1;}
-		if(keyIsDown(LEFT_ARROW)) {adder.x -= 0.9;have_pressed = 1;}
-		if(have_pressed)
-			this.velocity.add(adder);
-		if(this.velocity.magSq() > player_max_vel * player_max_vel){
-			this.velocity.normalize(); this.velocity.mult(player_max_vel);
-		}
-	} else {
-		this.velocity.add(this.accel);
-		if(this.velocity.magSq() > entity_max_vel * entity_max_vel){
-			//this.velocity.normalize(); this.velocity.mult(entity_max_vel);
-			this.velocity.mult(0.99);
-		}
+	this.velocity.add(this.accel);
+	if(this.velocity.magSq() > entity_max_vel * entity_max_vel){
+		//this.velocity.normalize(); this.velocity.mult(entity_max_vel);
+		this.velocity.mult(0.99);
 	}
 	this.position.add(this.velocity);
 	this.velocity.mult(this.friction);

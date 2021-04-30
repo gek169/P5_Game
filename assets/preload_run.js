@@ -137,6 +137,19 @@ function player_behavior(){
 	if(ppos.x - this.boxdims.x < 70) renderOffset.x += constrain(1.04*this.velocity.x,-player_max_vel,-1);
 	if(ppos.y + this.boxdims.y > height-70) renderOffset.y += constrain(1.04*this.velocity.y,1,player_max_vel);
 	if(ppos.y - this.boxdims.y < 70) renderOffset.y += constrain(1.04*this.velocity.y,-player_max_vel,-1);
+
+	let adder = createVector(0,0);
+	this.velocity.mult(0.8); //simulate a LOT of friction.
+	let have_pressed = 0;
+	if(keyIsDown(UP_ARROW)) {adder.y -= 0.9;have_pressed = 1;}
+	if(keyIsDown(DOWN_ARROW)) {adder.y += 0.9;have_pressed = 1;}
+	if(keyIsDown(RIGHT_ARROW)) {adder.x += 0.9;have_pressed = 1;}
+	if(keyIsDown(LEFT_ARROW)) {adder.x -= 0.9;have_pressed = 1;}
+	if(have_pressed)
+		this.velocity.add(adder);
+	if(this.velocity.magSq() > player_max_vel * player_max_vel){
+		this.velocity.normalize(); this.velocity.mult(player_max_vel);
+	}
 }
 
 function player_render(){
