@@ -16,14 +16,14 @@ function preload(){
 		xmlHttp.send( null );
 	let e = eval;
 	e(xmlHttp.responseText);
+	e(xmlHttp.responseText);
 }
 
 
 
 function setup() {
   url = getURL();
-  pixelDensity(1);
-  cnv = createCanvas(640, 480);
+
   setup_hook();
 }
 

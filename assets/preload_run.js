@@ -1,7 +1,5 @@
-
 {
-
-	assetman = {};
+	cnv = {}; player = {}; renderOffset = {}; assetman = {}; //explicitly delete anything that existed before us.
 //SOUNDS
 	assetman.click_sound = loadSound('assets/click.wav');
 	//IMAGES
@@ -45,6 +43,8 @@ function prepImage(obj){
 }
 
 function setup_hook(){
+  pixelDensity(1);
+  cnv = createCanvas(640, 480);
   cnv.mousePressed(playClick);
   //system = new ParticleSystem(createVector(width / 2, 50));
   renderOffset = createVector(0,0);
