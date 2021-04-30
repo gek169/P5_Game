@@ -14,6 +14,7 @@ const player_max_vel = 4;
 const debug_render_col = 0;
 let wintx; let winty;
 
+
 function preload(){
 	click_sound = loadSound('assets/click.wav');
 	backg = loadImage('assets/texture16.png');
@@ -50,6 +51,7 @@ function prepImage(){
 	bffr.filter(DILATE);
 	bffr.filter(POSTERIZE, 5);
 	backg = bffr.get();
+	bffr = 0; //explicit destruction.
 }
 
 function setup() {
@@ -73,9 +75,7 @@ function setup() {
   						0,-1, //render offsets
   						1//isPlayer
   						);
-  player = entity_system.entities[0];
-  player.currentAnimFrame = 0;
-  player.render = player_render;
+  setup_player(entity_system.entities[0]);
 
   entity_system.addEntity(createVector(200,100), 
       						10.0, 
@@ -109,11 +109,15 @@ function setup() {
   	-random(0.001, 0.02));
  }
  //translate(-width/2, -height/2);
- wintx = -width/2;
- winty = -height/2;
+ //wintx = -width/2;
+ //winty = -height/2;
 }
 
-
+function setup_player(obj){
+  player = obj;
+  player.currentAnimFrame = 0;
+  player.render = player_render;
+}
 
 function player_render(){
 	if(this.velocity.magSq() > (player_max_vel * player_max_vel)/4.0){
@@ -162,13 +166,14 @@ Rendering
 //translate(wintx, winty);
   background(51);
   image(backg, 0, 0);
+  /*
   system.origin = player.position.copy();
   system.origin.sub(renderOffset);
   system.addParticle();
   system.run();
-  
-  color(255,255,255,255);
-  stroke(255,255,255);
+  */
+  //color(255,255,255,255);
+  //stroke(255,255,255);
   //text(url, 100, 100);
   entity_system.render();
 }
