@@ -44,7 +44,7 @@ function prepImage(obj){
 
 function setup_hook(){
   pixelDensity(1);
-  cnv = createCanvas(640, 480);
+  cnv = createCanvas(1024, 768);
   cnv.mousePressed(playClick);
   //system = new ParticleSystem(createVector(width / 2, 50));
   renderOffset = createVector(0,0);

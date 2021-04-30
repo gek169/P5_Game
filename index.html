@@ -6,16 +6,20 @@
     <script defer="true" src="sketch.js"></script>
   </head>
   <body>
-    <main>
-    </main>
+  	<div id="canvascontainer" style="float:left;">
+  	<main>
+  	</main>
+  	</div>
+    <div id="devtools" style="display:block;">
     Mode: <b><a id="modename">Gameplay</a></b><br/>
     <button id="toggleEditorBtn">Click this to toggle the editor.</button><br/>
     Current tool is: <b><a id="toolname">None</a></b><br/>
     <button id="changeToolBtn">Click this to switch between the place and remove tools.</button><br/>
-    Tile to place is: <b><a id="tileplacename">None</a></b><br/>
+    Tile to place is: <b><a id="tileplacename">None</a></b>  as a(n)  <b><a id="entitytype">None</a></b> <br/>
     <button id="setPlaceTypeBtn">Click this to set the tile to place, in place mode.</button><br/>
+    <button id="setEntityTypeBtn">Click this to set whether you want to place .</button><br/>
     <button id="exportLvlBtn">Click this to export the level.</button><br/>
     <textarea id="exportLvlTxt" type="text" name="Level_Text" cols="40" rows="40"></textarea>
-    
+    </div>
   </body>
 </html>
