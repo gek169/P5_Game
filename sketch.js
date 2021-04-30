@@ -1,4 +1,3 @@
-let system;
 let cnv;
 let url;
 let entity_system;
@@ -10,20 +9,22 @@ const player_max_vel = 4;
 const debug_render_col = 0;
 let wintx; let winty;
 
-function preload(){
+function get_and_run(theURL){
 	var xmlHttp = new XMLHttpRequest();
-		xmlHttp.open( "GET", 'assets/preload_run.js', false ); //synchronous
+		xmlHttp.open( "GET", theURL, false ); //synchronous
 		xmlHttp.send( null );
 	let e = eval;
 	e(xmlHttp.responseText);
-	e(xmlHttp.responseText);
+}
+
+function preload(){
+	get_and_run('assets/preload_run.js');
 }
 
 
 
 function setup() {
   url = getURL();
-
   setup_hook();
 }
 
@@ -329,71 +330,3 @@ ESystem.prototype.render = function(){
 		this.particles[i].render();
 	}
 }
-
-
-
-
-
-
-
-
-/**
-	Extremely basic example of a particle system.
-**/
-
-
-
-// A simple Particle class
-let Particle = function(position) {
-  this.color = createVector(random(0,255),
-  							random(0,255),
-  							random(0,255));
-  this.acceleration = createVector(0, 0.05);
-  this.velocity = createVector(random(-1, 1), random(-1, 0));
-  this.position = position.copy();
-  this.position.add(renderOffset);
-  this.lifespan = 255;
-};
-
-Particle.prototype.run = function() {
-  this.update();
-  this.display();
-};
-
-// Method to update position
-Particle.prototype.update = function(){
-  this.velocity.add(this.acceleration);
-  this.position.add(this.velocity);
-  this.lifespan -= 2;
-};
-
-// Method to display
-Particle.prototype.display = function() {
-  noStroke();
-  fill(this.color.x, this.color.y, this.color.z, this.lifespan);
-  ellipse(this.position.x -renderOffset.x, this.position.y -renderOffset.y, 12, 12);
-};
-
-// Is the particle still useful?
-Particle.prototype.isDead = function(){
-  return this.lifespan < 0;
-};
-
-let ParticleSystem = function(position) {
-  this.origin = position.copy();
-  this.particles = [];
-};
-
-ParticleSystem.prototype.addParticle = function() {
-  this.particles.push(new Particle(this.origin));
-};
-
-ParticleSystem.prototype.run = function() {
-  for (let i = this.particles.length-1; i >= 0; i--) {
-    let p = this.particles[i];
-    p.run();
-    if (p.isDead()) {
-      this.particles.splice(i, 1);
-    }
-  }
-};
