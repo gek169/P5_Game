@@ -30,7 +30,7 @@ function preload(){
 		loadImage('assets/player_move_3.png')
 	);
 	player_anim_frames.push(
-		loadImage('assets/player_move_2.png')
+		player_anim_frames[1]
 	);
 }
 
