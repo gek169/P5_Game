@@ -50,7 +50,7 @@ function onclick_hook(){
 
 function setup_hook(){
   pixelDensity(1);
-  cnv = createCanvas(1024, 768);
+  cnv = createCanvas(1000, 550);
   //cnv.mousePressed(playClick);
   //system = new ParticleSystem(createVector(width / 2, 50));
   renderOffset = createVector(0,0);

@@ -13,16 +13,22 @@
     <div id="devtools" style="display:block;">
     Mode: <b><a id="modename">Gameplay</a></b><br/>
     <button id="toggleEditorBtn">Click this to toggle the editor.</button><br/>
-    Current tool is: <b><a id="toolname">None</a></b><br/>
-    
-    <button id="changeToolBtn">Click this to switch between the move, place, and remove tools.</button><br/>
-	Interacting with layer: <b><a id="interact_type">Renderable</a></b><br/>
-    <button id="changeInteractTypeBtn">Click this to change the layer you interact with</button><br/>
-    Tile to place is: <b><a id="tileplacename">None</a></b><br/>
-    Place Factor: <input id="PlaceFactor" type="text" value="1.0"></input><br/>
-    <button id="setEntityTypeBtn">Click this to switch the type of thing you want to place.</button><br/>
-    <button id="exportLvlBtn">Click this to export the level.</button><br/>
-    <textarea id="exportLvlTxt" type="text" name="Level_Text" cols="40" rows="20"></textarea>
+	    <div id="devdetails" style="display:none;">
+	    Current tool is: <b><a id="toolname">N/A</a></b><br/>
+	    <button id="changeToolBtn">Change Active Tool</button><br/>
+		Interacting with layer: <b><a id="interact_type">N/A</a></b><br/>
+	    <button id="changeInteractTypeBtn">Click this to change the layer you interact with</button><br/>
+	    Place Factor: <input id="PlaceFactor" type="text" value="1.0"></input><br/>
+		Entity creator func: <input id="tileToPlace" type="text" value="null"></input><br/>
+	    Mass: <input id="mass" type="text" value="0"></input><br/>
+	    Radius 1: <input id="radius1" type="text" value="16"></input>
+	    Radius 2: <input id="radius2" type="text" value="0"></input><br/>
+	    Friction: <input id="friction" type="text" value="0.99"></input><br/>
+	    Sprite Variable Name: <input id="spritename" type="text" value="dummy_img"></input><br/>
+	    
+	    <button id="exportLvlBtn">Click this to export the level.</button><br/>
+	    <textarea id="exportLvlTxt" type="text" name="Level_Text" cols="40" rows="10"></textarea>
+	    </div>
     </div>
   </body>
 </html>

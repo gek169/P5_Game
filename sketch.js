@@ -1,9 +1,11 @@
 let cnv;
 let url;
 let entity_system;
+let dummy_img;
 let assetman; //manages assets.
 let global_vars; //global variables.
 let selected_layer = 0; //Renderables.
+let editor_tool = 0; //move, place, remove
 let player;
 let selectedEntity;
 let renderOffset;
@@ -25,6 +27,18 @@ function get_and_run(theURL){
 $("#exportLvlBtn").click(function(){
 	$("#exportLvlTxt").val( $("#exportLvlTxt").val() + "Works!\n");
 });
+$("#changeToolBtn").click(function(){
+	if(!editor_is_active) return;
+	editor_tool++; editor_tool %= 3;
+	if(editor_tool == 0)
+		$("#toolname").text("Move");
+	else if(editor_tool == 1)
+		$("#toolname").text("Place");
+	else if(editor_tool == 2)
+		$("#toolname").text("Remove");
+	else
+		$("#toolname").text("Invalid");
+});
 
 
 $("#changeInteractTypeBtn").click(function(){
@@ -45,11 +59,32 @@ $("#toggleEditorBtn").click(function(){
 	editor_is_active = !editor_is_active;
 	if(editor_is_active){
 		$("#modename").text("Editing");
+		$("#devdetails").show();
+		
 		//Save the position of the screen.
 		renderOffsetSaved_Gameplay = renderOffset;
 		renderOffset = renderOffsetSaved_Editor;
 		selectedEntity = {};
+
+	if(editor_tool == 0)
+		$("#toolname").text("Move");
+	else if(editor_tool == 1)
+		$("#toolname").text("Place");
+	else if(editor_tool == 2)
+		$("#toolname").text("Remove");
+	else
+		$("#toolname").text("Invalid");
+
+	if(selected_layer == 0)
+		$("#interact_type").text("Renderables");
+	else if(selected_layer == 1)
+		$("#interact_type").text("Entities");
+	else if(selected_layer == 2)
+		$("#interact_type").text("Particles");
+	else if(selected_layer == 3)
+		$("#interact_type").text("Foreground Renderables");
 	} else {
+		$("#devdetails").hide();
 		$("#modename").text("Gameplay");
 		renderOffsetSaved_Editor = renderOffset;
 		renderOffset = renderOffsetSaved_Gameplay;
@@ -58,6 +93,7 @@ $("#toggleEditorBtn").click(function(){
 });
 
 function preload(){
+	dummy_img = loadImage('assets/aball.png');
 	get_and_run('assets/preload_run.js');
 }
 
