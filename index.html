@@ -18,15 +18,22 @@
 	    <button id="changeToolBtn">Change Active Tool</button><br/>
 		Interacting with layer: <b><a id="interact_type">N/A</a></b><br/>
 	    <button id="changeInteractTypeBtn">Click this to change the layer you interact with</button><br/>
-	    Place Factor: <input id="PlaceFactor" type="text" value="1.0"></input><br/>
-		Entity creator func: <input id="tileToPlace" type="text" value="null"></input><br/>
-	    Mass: <input id="mass" type="text" value="0"></input><br/>
-	    Radius 1: <input id="radius1" type="text" value="16"></input>
-	    Radius 2: <input id="radius2" type="text" value="0"></input><br/>
-	    Friction: <input id="friction" type="text" value="0.99"></input><br/>
-	    Sprite Variable Name: <input id="spritename" type="text" value="dummy_img"></input><br/>
+	    align: <input id="PlaceFactor" type="text" size="4" value="1.0"></input><br/>
+		setup_: <input id="tileToPlace" type="text" size="10" value="null"></input><br/>
+	    M: <input id="mass" type="text" size="4" value="0"></input>
+	    R1: <input id="radius1" type="text" size="4" value="16"></input>
+	    R2: <input id="radius2" type="text" size="4" value="0"></input><br/>
+	    Friction: <input id="friction" type="text" size="4" value="0.99"></input><br/>
+	    Sprite Variable Name: <input id="spritename" type="text" size="10" value="dummy_img"></input><br/>
+	    Sw: <input id="SpriteW" type="text" size="4" value="16"></input>
+	    Sh: <input id="SpriteH" type="text" size="4" value="16"></input>	    
+	    RoX: <input id="renderOffsetX" type="text" size="4" value="0"></input>
+	    RoY: <input id="renderOffsetY" type="text" size="4" value="0"></input>
+	    Plyr?<input id="isPlayer" type="text" size="4" value="0"></input>
+	    <br/>
 	    
-	    <button id="exportLvlBtn">Click this to export the level.</button><br/>
+	    
+	    <button id="exportLvlBtn">Click to export entities.</button><br/>
 	    <textarea id="exportLvlTxt" type="text" name="Level_Text" cols="40" rows="10"></textarea>
 	    </div>
     </div>
