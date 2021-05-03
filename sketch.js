@@ -7,7 +7,8 @@ let global_vars; //global variables.
 let selected_layer = 0; //Renderables.
 let editor_tool = 0; //move, place, remove
 let player;
-let selectedEntity;
+let selectedEntity = 0;
+let selected_i = -1;
 let renderOffset;
 let renderOffsetSaved_Gameplay; //when switch between modes, the render offset may be changed.
 let renderOffsetSaved_Editor; //when switch between modes
@@ -44,7 +45,7 @@ $("#changeToolBtn").click(function(){
 $("#changeInteractTypeBtn").click(function(){
 	if(!editor_is_active) return;
 	selected_layer++; selected_layer%=4; //renderables, entities, particles, fgrenderables.
-	selectedEntity = {};
+	selectedEntity = 0;
 	if(selected_layer == 0)
 		$("#interact_type").text("Renderables");
 	else if(selected_layer == 1)
@@ -64,7 +65,7 @@ $("#toggleEditorBtn").click(function(){
 		//Save the position of the screen.
 		renderOffsetSaved_Gameplay = renderOffset;
 		renderOffset = renderOffsetSaved_Editor;
-		selectedEntity = {};
+		selectedEntity = 0;
 
 	if(editor_tool == 0)
 		$("#toolname").text("Move");
@@ -88,7 +89,7 @@ $("#toggleEditorBtn").click(function(){
 		$("#modename").text("Gameplay");
 		renderOffsetSaved_Editor = renderOffset;
 		renderOffset = renderOffsetSaved_Gameplay;
-		selectedEntity = {};
+		selectedEntity = 0;
 	}
 });
 
@@ -135,6 +136,7 @@ function engine_onclick(){
 					mouseY > screen_pos.y - active_elem.boxdims.y
 				){
 					selectedEntity = active_elem;
+					selected_i = i;
 				}
 			} else {
 				if(
@@ -144,6 +146,7 @@ function engine_onclick(){
 					mouseY > screen_pos.y - active_elem.boxdims.x
 				){
 					selectedEntity = active_elem;
+					selected_i = i;
 				}
 			}
 		}
@@ -167,6 +170,28 @@ function draw() {
 			if(keyIsDown(RIGHT_ARROW))	renderOffset.x += 10.0;
 			if(keyIsDown(DOWN_ARROW))	renderOffset.y += 10.0;
 			if(keyIsDown(LEFT_ARROW))	renderOffset.x -= 10.0;
+		}
+		if(selectedEntity && keyIsDown(77) && editor_tool == 0){
+			selectedEntity.position.x = mouseX + renderOffset.x;
+			selectedEntity.position.y = mouseY + renderOffset.y;
+		}
+		if(selectedEntity && keyIsDown(46) && editor_tool != 1){
+			if(selected_layer == 0){
+				entity_system.removeRenderable(selected_i);
+				selectedEntity = 0; selected_i = -1;
+			}
+			if(selected_layer == 1){
+				entity_system.removeEntity(selected_i);
+				selectedEntity = 0; selected_i = -1;
+			}
+			if(selected_layer == 2){
+				entity_system.removeParticle(selected_i);
+				selectedEntity = 0; selected_i = -1;
+			}
+			if(selected_layer == 3){
+				entity_system.removeFgRenderable(selected_i);
+				selectedEntity = 0; selected_i = -1;
+			}
 		}
 	}
 	entity_system.render();
@@ -435,6 +460,9 @@ ESystem.prototype.removeEntity = function(i){
 };
 ESystem.prototype.removeRenderable = function(i){
 	this.renderables.splice(i, 1);
+};
+ESystem.prototype.removeFgRenderable = function(i){
+	this.fgrenderables.splice(i, 1);
 };
 ESystem.prototype.removeParticle = function(i){
 	this.particles.splice(i, 1);
