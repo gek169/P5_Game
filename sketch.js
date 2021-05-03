@@ -171,9 +171,18 @@ function draw() {
 			if(keyIsDown(DOWN_ARROW))	renderOffset.y += 10.0;
 			if(keyIsDown(LEFT_ARROW))	renderOffset.x -= 10.0;
 		}
+		if(!selectedEntity && keyIsDown(67)){
+			
+		}
 		if(selectedEntity && keyIsDown(77) && editor_tool == 0){
 			selectedEntity.position.x = mouseX + renderOffset.x;
 			selectedEntity.position.y = mouseY + renderOffset.y;
+			let pf = parseFloat($("#PlaceFactor").val());
+			//console.log(pf);
+			if(pf > 0 && pf <= 10000){
+				selectedEntity.position.x = pf * Math.floor(selectedEntity.position.x / pf);
+				selectedEntity.position.y = pf * Math.floor(selectedEntity.position.y / pf);
+			}
 		}
 		if(selectedEntity && keyIsDown(46) && editor_tool != 1){
 			if(selected_layer == 0){
