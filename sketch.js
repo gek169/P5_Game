@@ -153,6 +153,7 @@ function engine_onclick(){
 	}
 }
 
+let engine_toggle_create = 0;
 
 function draw() {
 	if(!editor_is_active){
@@ -171,8 +172,61 @@ function draw() {
 			if(keyIsDown(DOWN_ARROW))	renderOffset.y += 10.0;
 			if(keyIsDown(LEFT_ARROW))	renderOffset.x -= 10.0;
 		}
-		if(!selectedEntity && keyIsDown(67)){
-			
+		if(!keyIsDown(67)) {engine_toggle_create = 0;}
+		if(!engine_toggle_create && !selectedEntity && keyIsDown(67) && editor_tool == 1){ //Immediately create an entity.
+			engine_toggle_create = 1;
+			let setup_func_name = "setup_" + $("#tileToPlace").val();
+			let mass = parseFloat($("#mass").val());
+			let r1 = parseFloat($("#radius1").val());
+			let r2 = parseFloat($("#radius2").val());
+			let frict = parseFloat($("#friction").val());
+			let spritename = ($("#spritename").val());
+			let SpriteW = parseFloat($("#SpriteW").val());
+			let SpriteH = parseFloat($("#SpriteH").val());
+			let renderOffsetX = parseFloat($("#renderOffsetX").val());
+			let renderOffsetY = parseFloat($("#renderOffsetY").val());
+			let isPlayer = parseFloat($("#isPlayer").val());
+			let vec = createVector(mouseX + renderOffset.x, 
+									mouseY + renderOffset.y);
+			let active_array;
+			if(selected_layer == 0)
+				{
+					entity_system.addRenderable(
+						vec,
+						mass, r1, r2, frict, eval(spritename), 
+						SpriteW, SpriteH, renderOffsetX, renderOffsetY, isPlayer
+					);
+					active_array = entity_system.renderables;
+				}
+			else if(selected_layer == 1)
+				{
+					entity_system.addEntity(
+						vec,
+						mass, r1, r2, frict, eval(spritename), 
+						SpriteW, SpriteH, renderOffsetX, renderOffsetY, isPlayer
+					);
+					active_array = entity_system.entities;
+				}
+			else if(selected_layer == 2)
+				{
+					entity_system.addParticle(
+											vec,
+											mass, r1, r2, frict, eval(spritename), 
+											SpriteW, SpriteH, renderOffsetX, renderOffsetY, isPlayer
+										);
+					active_array = entity_system.particles;
+				}
+			else if(selected_layer == 3){
+				entity_system.addFgRenderable(
+										vec,
+										mass, r1, r2, frict, eval(spritename), 
+										SpriteW, SpriteH, renderOffsetX, renderOffsetY, isPlayer
+									);
+				active_array = entity_system.fgrenderables;
+			}
+			if(setup_func_name != "setup_nil"){
+				eval(setup_func_name)(active_array[active_array.length - 1]);
+			}
 		}
 		if(selectedEntity && keyIsDown(77) && editor_tool == 0){
 			selectedEntity.position.x = mouseX + renderOffset.x;
@@ -233,6 +287,7 @@ let Game_Entity = function(position, mass, radius, radius2, friction, sprite, sp
 	this.renderoffy = renderoffy;
 	this.friction = friction;
 	this.isPlayer = 0;
+	this.ctor_name = "null";
 };
 
 Game_Entity.prototype.integrate = function(){

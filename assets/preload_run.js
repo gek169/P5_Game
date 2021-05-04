@@ -104,6 +104,7 @@ function setup_hook(){
     						random(0.1,0.8), 10.0, 0.0, random(0.99, 1.0), assetman.aball, 10,10,0,0,0);
   entity_system.particles[entity_system.particles.length-1].accel = createVector(0,
   	-random(0.001, 0.02));
+  	entity_system.particles[entity_system.particles.length-1].ctor_name = "aball_particle";
  }
 
 }
