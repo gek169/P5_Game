@@ -9,7 +9,7 @@ function windowResized(){
 }
 
 function draw() {
-  background(0);
+  background(0,0,60);
 
   let locX = mouseX - height / 2;
   let locY = mouseY - width / 2;
