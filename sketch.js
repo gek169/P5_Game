@@ -293,7 +293,7 @@ let Game_Entity = function(position, mass, radius, radius2, friction, sprite, sp
 	this.renderoffy = renderoffy;
 	this.friction = friction;
 	this.isPlayer = 0;
-	this.ctor_name = "null";
+	this.ctor_name = "nil";
 };
 
 Game_Entity.prototype.integrate = function(){

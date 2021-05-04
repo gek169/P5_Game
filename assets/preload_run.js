@@ -48,6 +48,8 @@ function onclick_hook(){
 	
 }
 
+
+
 function setup_hook(){
   pixelDensity(1);
   cnv = createCanvas(1000, 550);
@@ -83,14 +85,7 @@ function setup_hook(){
       						0,0,
       						0
       					);
-  entity_system.entities[entity_system.entities.length-1].was_colliding_frames_ago = 0;
-  entity_system.entities[entity_system.entities.length-1].oncollide = function(other, diff){
-	if(diff > 3)
-  	if(this.was_colliding_frames_ago <= 0){
-  		playClick();
-  		this.was_colliding_frames_ago = 30;
-  	}
-  };
+  setup_collideable_test(entity_system.entities[entity_system.entities.length-1]);
   
   entity_system.entities[entity_system.entities.length-1].behavior = function(){
   	if(this.was_colliding_frames_ago>0)this.was_colliding_frames_ago--;
@@ -124,7 +119,15 @@ function game_logic(){
 
 function playClick(){assetman.click_sound.play();}
 
+
+
+
+
+
+
+
 function setup_player(obj){
+  obj.ctor_name = "player"
   player = obj;
   player.currentAnimFrame = 0;
   player.isPlayingAnim = 0;
@@ -171,4 +174,20 @@ function player_render(){
 		this.framesOnCurrentAnim = 6;
 	}
 	this.render_internal();
+}
+
+
+function setup_collideable_test(obj){
+	obj.was_colliding_frames_ago = 0;
+	obj.oncollide = function(other, diff){
+		if(diff > 3)
+	  	if(this.was_colliding_frames_ago <= 0){
+	  		playClick();
+	  		this.was_colliding_frames_ago = 30;
+	  	}
+	  };
+   obj.behavior = function(){
+     	if(this.was_colliding_frames_ago>0)this.was_colliding_frames_ago--;
+     };
+     obj.ctor_name = "collideable_test";
 }
