@@ -17,6 +17,12 @@ const entity_max_vel = 500;
 const player_max_vel = 4;
 let wintx; let winty;
 
+//createCanvas(windowWidth, windowHeight);
+//function windowResized() {
+//  resizeCanvas(windowWidth, windowHeight);
+//}
+
+
 function get_and_run(theURL){
 	var xmlHttp = new XMLHttpRequest();
 		xmlHttp.open( "GET", theURL, false ); //synchronous
