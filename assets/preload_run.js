@@ -3,19 +3,19 @@
 //SOUNDS
 	assetman.click_sound = loadSound('assets/click.wav');
 	//IMAGES
-	assetman.backg = fetchImage('assets/texture16.png');
-	assetman.aball = fetchImage('assets/aball.png');
-	assetman.ahead1 = fetchImage('assets/Army_Head_1.png');
+	assetman.backg = loadImage('assets/texture16.png');
+	assetman.aball = loadImage('assets/aball.png');
+	assetman.ahead1 = loadImage('assets/Army_Head_1.png');
 	//ANIMATIONS
 	assetman.player_anim_frames = [];
 	assetman.player_anim_frames.push(
-		fetchImage('assets/player_move_1.png')
+		loadImage('assets/player_move_1.png')
 	);
 	assetman.player_anim_frames.push(
-		fetchImage('assets/player_move_2.png')
+		loadImage('assets/player_move_2.png')
 	);
 	assetman.player_anim_frames.push(
-		fetchImage('assets/player_move_3.png')
+		loadImage('assets/player_move_3.png')
 	);
 	assetman.player_anim_frames.push(
 		assetman.player_anim_frames[1]
@@ -59,49 +59,55 @@ function setup_hook(){
   frameRate(60);
   prepImage();
   entity_system = new ESystem();
-  global_vars.backg = assetman.backg; assetman.backg=0;
   entity_system.render_background = function(){
   	  	background(51);
-  		image(global_vars.backg, 0, 0);
+  		image(assetman.backg, 0, 0);
   }
   entity_system.addEntity(
   					createVector(100,100),  //initial position
   						10.0,  //mass
   						30.0, 0.0, //radius1, radius2. if radius2 is zero, this is a sphere.
   						0.94,  //friction- 1=no friction, 0=velocity immediately drops to zero.
-  						assetman.ahead1, //sprite
+  						//assetman.ahead1, //sprite
   						40,40, //spritew, spriteh
   						0,-1, //render offsets
   						1//isPlayer
   						);
   setup_player(entity_system.entities[0]);
+  
 
   entity_system.addEntity(createVector(200,100), 
       						10.0, 
       						40.0, 40.0, 
       						0.98, 
-      						assetman.ahead1, 
       						40,40,
       						0,0,
       						0
       					);
   setup_collideable_test(entity_system.entities[entity_system.entities.length-1]);
-  
+  entity_system.entities[entity_system.entities.length-1].sprite = assetman.ahead1;
   entity_system.entities[entity_system.entities.length-1].behavior = function(){
   	if(this.was_colliding_frames_ago>0)this.was_colliding_frames_ago--;
   };
 	entity_system.addEntity(createVector(280,100), 
-      						0.0, 100.0, 100.0, 0.94, assetman.ahead1, 100,100,0,0,0);
+      						0.0, 100.0, 100.0, 0.94, 100,100,0,0,0);
+    entity_system.entities[entity_system.entities.length-1].sprite = assetman.ahead1;
   entity_system.addEntity(createVector(200,200),
-        						100.0, 80.0, 0.0, 0.94, assetman.aball, 80,80,0,0,0);
+        						100.0, 80.0, 0.0, 0.94, 80,80,0,0,0);
+    entity_system.entities[entity_system.entities.length-1].sprite = assetman.aball;
  for(let i = 0; i < 2000; i++){
   entity_system.addParticle(createVector(random(10,width-10),random(10,height-10)),
-    						random(0.1,0.8), 10.0, 0.0, random(0.99, 1.0), assetman.aball, 10,10,0,0,0);
-  entity_system.particles[entity_system.particles.length-1].accel = createVector(0,
-  	-random(0.001, 0.02));
-  	entity_system.particles[entity_system.particles.length-1].ctor_name = "aball_particle";
+    						random(0.1,0.8), 10.0, 0.0, random(0.99, 1.0), 10,10,0,0,0);
+  setup_aball_particle(entity_system.particles[entity_system.particles.length-1]);
  }
 
+}
+
+function setup_aball_particle(obj){
+	obj.accel = createVector(0,
+	  	-random(0.001, 0.02));
+	obj.ctor_name = "aball_particle";	
+	obj.sprite = assetman.aball;
 }
 
 function game_logic(){
@@ -129,6 +135,7 @@ function playClick(){assetman.click_sound.play();}
 function setup_player(obj){
   obj.ctor_name = "player"
   player = obj;
+  player.sprite = assetman.ahead1;
   player.currentAnimFrame = 0;
   player.isPlayingAnim = 0;
   player.render = player_render;
@@ -178,6 +185,7 @@ function player_render(){
 
 
 function setup_collideable_test(obj){
+	obj.sprite = assetman.aball;
 	obj.was_colliding_frames_ago = 0;
 	obj.oncollide = function(other, diff){
 		if(diff > 3)

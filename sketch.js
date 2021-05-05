@@ -22,11 +22,8 @@ let wintx; let winty;
 //  resizeCanvas(windowWidth, windowHeight);
 //}
 
-function fetchImage(path){
-	let obj = loadImage(path);
-	obj.src = path;
-	return obj
-}
+
+
 
 function get_and_run(theURL){
 	var xmlHttp = new XMLHttpRequest();
@@ -37,8 +34,27 @@ function get_and_run(theURL){
 }
 
 $("#exportLvlBtn").click(function(){
-	$("#exportLvlTxt").val( $("#exportLvlTxt").val() + "Works!\n");
+	let huge_thing = {};
+	huge_thing.globals = JSON.stringify(global_vars);
+	huge_thing.renderables = [];
+	huge_thing.fgrenderables = [];
+	huge_thing.entities = [];
+	huge_thing.particles = [];
+	for(let i = 0; i < entity_system.renderables.length; i++){
+		huge_thing.renderables.push(entity_system.renderables[i].serialize())
+	}
+	for(let i = 0; i < entity_system.fgrenderables.length; i++){
+		huge_thing.fgrenderables.push(entity_system.fgrenderables[i].serialize())
+	}
+	for(let i = 0; i < entity_system.entities.length; i++){
+		huge_thing.entities.push(entity_system.entities[i].serialize())
+	}
+	for(let i = 0; i < entity_system.particles.length; i++){
+		huge_thing.particles.push(entity_system.particles[i].serialize())
+	}
+	$("#exportLvlTxt").val(JSON.stringify(huge_thing));
 });
+/*
 $("#changeToolBtn").click(function(){
 	if(!editor_is_active) return;
 	editor_tool++; editor_tool %= 3;
@@ -51,7 +67,7 @@ $("#changeToolBtn").click(function(){
 	else
 		$("#toolname").text("Invalid");
 });
-
+*/
 
 $("#changeInteractTypeBtn").click(function(){
 	if(!editor_is_active) return;
@@ -105,7 +121,7 @@ $("#toggleEditorBtn").click(function(){
 });
 
 function preload(){
-	dummy_img = fetchImage('assets/aball.png');
+	dummy_img = loadImage('assets/aball.png');
 	get_and_run('assets/preload_run.js');
 }
 
@@ -172,6 +188,12 @@ function draw() {
 		game_logic();
 	} else {
 		//editor logic goes here. TODO.
+		if(editor_tool == 0)
+			$("#toolname").text("Move");
+		else if(editor_tool == 1)
+			$("#toolname").text("Place");
+		else if(editor_tool == 2)
+			$("#toolname").text("Remove");
 		if(!keyIsDown(SHIFT)){
 			if(keyIsDown(UP_ARROW))	renderOffset.y -= 2.0;
 			if(keyIsDown(RIGHT_ARROW))	renderOffset.x += 2.0;
@@ -184,14 +206,14 @@ function draw() {
 			if(keyIsDown(LEFT_ARROW))	renderOffset.x -= 10.0;
 		}
 		if(!keyIsDown(67)) {engine_toggle_create = 0;}
-		if(!engine_toggle_create && !selectedEntity && keyIsDown(67) && editor_tool == 1){ //Immediately create an entity.
+		if(keyIsDown(68)){selectedEntity = 0;}
+		if(!engine_toggle_create && keyIsDown(67) && !selectedEntity){ //Immediately create an entity.
 			engine_toggle_create = 1;
 			let setup_func_name = "setup_" + $("#tileToPlace").val();
 			let mass = parseFloat($("#mass").val());
 			let r1 = parseFloat($("#radius1").val());
 			let r2 = parseFloat($("#radius2").val());
 			let frict = parseFloat($("#friction").val());
-			let spritename = ($("#spritename").val());
 			let SpriteW = parseFloat($("#SpriteW").val());
 			let SpriteH = parseFloat($("#SpriteH").val());
 			let renderOffsetX = parseFloat($("#renderOffsetX").val());
@@ -204,42 +226,51 @@ function draw() {
 				{
 					entity_system.addRenderable(
 						vec,
-						mass, r1, r2, frict, eval(spritename), 
+						mass, r1, r2, frict, 
 						SpriteW, SpriteH, renderOffsetX, renderOffsetY, isPlayer
 					);
+					//entity_system.renderables[entity_system.renderables.length - 1].sprite = eval(spritename);
 					active_array = entity_system.renderables;
 				}
 			else if(selected_layer == 1)
 				{
 					entity_system.addEntity(
 						vec,
-						mass, r1, r2, frict, eval(spritename), 
+						mass, r1, r2, frict, 
 						SpriteW, SpriteH, renderOffsetX, renderOffsetY, isPlayer
 					);
+					//entity_system.entities[entity_system.entities.length - 1].sprite = eval(spritename);
 					active_array = entity_system.entities;
 				}
 			else if(selected_layer == 2)
 				{
 					entity_system.addParticle(
 											vec,
-											mass, r1, r2, frict, eval(spritename), 
+											mass, r1, r2, frict, 
 											SpriteW, SpriteH, renderOffsetX, renderOffsetY, isPlayer
 										);
+					//entity_system.particles[entity_system.particles.length - 1].sprite = eval(spritename);
 					active_array = entity_system.particles;
 				}
 			else if(selected_layer == 3){
 				entity_system.addFgRenderable(
 										vec,
-										mass, r1, r2, frict, eval(spritename), 
+										mass, r1, r2, frict, 
 										SpriteW, SpriteH, renderOffsetX, renderOffsetY, isPlayer
 									);
+				//entity_system.fgrenderables[entity_system.fgrenderables.length - 1].sprite = eval(spritename);
 				active_array = entity_system.fgrenderables;
+			} else {
+				console.log("INTERNAL ERROR!!!! Invalid selected layer.");
+				return;
 			}
 			if(setup_func_name != "setup_nil"){
 				eval(setup_func_name)(active_array[active_array.length - 1]);
 			}
+			editor_tool = 1;
 		}
-		if(selectedEntity && keyIsDown(77) && editor_tool == 0){
+		if(selectedEntity && keyIsDown(77)){
+			editor_tool = 0;
 			selectedEntity.position.x = mouseX + renderOffset.x;
 			selectedEntity.position.y = mouseY + renderOffset.y;
 			let pf = parseFloat($("#PlaceFactor").val());
@@ -249,7 +280,8 @@ function draw() {
 				selectedEntity.position.y = pf * Math.floor(selectedEntity.position.y / pf);
 			}
 		}
-		if(selectedEntity && keyIsDown(46) && editor_tool != 1){
+		if(selectedEntity && keyIsDown(46) ){
+			editor_tool = 2;
 			if(selected_layer == 0){
 				entity_system.removeRenderable(selected_i);
 				selectedEntity = 0; selected_i = -1;
@@ -285,9 +317,9 @@ function draw() {
 
 
 //Entity class
-let Game_Entity = function(position, mass, radius, radius2, friction, sprite, spritew, spriteh, renderoffx, renderoffy){
+let Game_Entity = function(position, mass, radius, radius2, friction, spritew, spriteh, renderoffx, renderoffy){
 	this.position = position.copy();
-	this.sprite = sprite;
+	this.sprite = dummy_img;
 	this.velocity = createVector(0,0);
 	this.accel = createVector(0,0);
 	this.mass = mass;
@@ -309,7 +341,6 @@ Game_Entity.prototype.serialize = function(){
 	var export_data = {};
 	export_data.pos_x = this.position.x.toString();
 	export_data.pos_y = this.position.y.toString();
-	export_data.spritename = this.sprite.src;
 	export_data.spritew = this.spritew.toString();
 	export_data.spriteh = this.spriteh.toString();
 	export_data.renderoffx = this.renderoffx.toString();
@@ -318,7 +349,6 @@ Game_Entity.prototype.serialize = function(){
 	export_data.isPlayer = this.isPlayer.toString();
 	export_data.ctor_name = this.ctor_name.toString();
 	export_data.extdata = JSON.stringify(this.extdata);
-
 	return JSON.stringify(export_data);
 };
 
@@ -531,23 +561,23 @@ let ESystem = function(){
 	this.fgrenderables = [];
 };
 
-ESystem.prototype.addEntity = function(position, mass, radius, radius2, friction, sprite, spritew, spriteh, renderoffx, renderoffy, isPlayer){
-	this.entities.push(new Game_Entity(position, mass, radius, radius2, friction, sprite, spritew, spriteh, renderoffx, renderoffy));
+ESystem.prototype.addEntity = function(position, mass, radius, radius2, friction, spritew, spriteh, renderoffx, renderoffy, isPlayer){
+	this.entities.push(new Game_Entity(position, mass, radius, radius2, friction, spritew, spriteh, renderoffx, renderoffy));
 	this.entities[this.entities.length - 1].isPlayer = isPlayer;
 };
 
-ESystem.prototype.addRenderable = function(position, mass, radius, radius2, friction, sprite, spritew, spriteh, renderoffx, renderoffy, isPlayer){
-	this.renderables.push(new Game_Entity(position, mass, radius, radius2, friction, sprite, spritew, spriteh, renderoffx, renderoffy));
+ESystem.prototype.addRenderable = function(position, mass, radius, radius2, friction, spritew, spriteh, renderoffx, renderoffy, isPlayer){
+	this.renderables.push(new Game_Entity(position, mass, radius, radius2, friction, spritew, spriteh, renderoffx, renderoffy));
 	this.renderables[this.renderables.length - 1].isPlayer = isPlayer;
 };
 
-ESystem.prototype.addFgRenderable = function(position, mass, radius, radius2, friction, sprite, spritew, spriteh, renderoffx, renderoffy, isPlayer){
-	this.fgrenderables.push(new Game_Entity(position, mass, radius, radius2, friction, sprite, spritew, spriteh, renderoffx, renderoffy));
+ESystem.prototype.addFgRenderable = function(position, mass, radius, radius2, friction, spritew, spriteh, renderoffx, renderoffy, isPlayer){
+	this.fgrenderables.push(new Game_Entity(position, mass, radius, radius2, friction, spritew, spriteh, renderoffx, renderoffy));
 	this.fgrenderables[this.renderables.length - 1].isPlayer = isPlayer;
 };
 
-ESystem.prototype.addParticle = function(position, mass, radius, radius2, friction, sprite, spritew, spriteh, renderoffx, renderoffy, isPlayer){
-	this.particles.push(new Game_Entity(position, mass, radius, radius2, friction, sprite, spritew, spriteh, renderoffx, renderoffy))
+ESystem.prototype.addParticle = function(position, mass, radius, radius2, friction, spritew, spriteh, renderoffx, renderoffy, isPlayer){
+	this.particles.push(new Game_Entity(position, mass, radius, radius2, friction, spritew, spriteh, renderoffx, renderoffy))
 	this.particles[this.particles.length - 1].isPlayer = isPlayer;
 };
 
