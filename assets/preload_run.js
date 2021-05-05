@@ -3,19 +3,19 @@
 //SOUNDS
 	assetman.click_sound = loadSound('assets/click.wav');
 	//IMAGES
-	assetman.backg = loadImage('assets/texture16.png');
-	assetman.aball = loadImage('assets/aball.png');
-	assetman.ahead1 = loadImage('assets/Army_Head_1.png');
+	assetman.backg = fetchImage('assets/texture16.png');
+	assetman.aball = fetchImage('assets/aball.png');
+	assetman.ahead1 = fetchImage('assets/Army_Head_1.png');
 	//ANIMATIONS
 	assetman.player_anim_frames = [];
 	assetman.player_anim_frames.push(
-		loadImage('assets/player_move_1.png')
+		fetchImage('assets/player_move_1.png')
 	);
 	assetman.player_anim_frames.push(
-		loadImage('assets/player_move_2.png')
+		fetchImage('assets/player_move_2.png')
 	);
 	assetman.player_anim_frames.push(
-		loadImage('assets/player_move_3.png')
+		fetchImage('assets/player_move_3.png')
 	);
 	assetman.player_anim_frames.push(
 		assetman.player_anim_frames[1]
