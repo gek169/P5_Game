@@ -300,8 +300,8 @@ let Game_Entity = function(position, mass, radius, radius2, friction, sprite, sp
 	this.isPlayer = 0;
 	this.ctor_name = "nil";
 	this.extdata = {};
-	this.set_extdata = function(){return "";} //generate extdata
-	this.get_extdata = function(obj){return;}
+	this.set_extdata = function(){return;} //generate extdata from our members.
+	this.get_extdata = function(obj){return;} //generate members from our extdata.
 };
 
 Game_Entity.prototype.serialize = function(){
