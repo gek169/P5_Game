@@ -22,6 +22,11 @@ let wintx; let winty;
 //  resizeCanvas(windowWidth, windowHeight);
 //}
 
+function fetchImage(path){
+	let obj = loadImage(path);
+	obj.src = path;
+	return obj
+}
 
 function get_and_run(theURL){
 	var xmlHttp = new XMLHttpRequest();
@@ -100,7 +105,7 @@ $("#toggleEditorBtn").click(function(){
 });
 
 function preload(){
-	dummy_img = loadImage('assets/aball.png');
+	dummy_img = fetchImage('assets/aball.png');
 	get_and_run('assets/preload_run.js');
 }
 
@@ -294,6 +299,27 @@ let Game_Entity = function(position, mass, radius, radius2, friction, sprite, sp
 	this.friction = friction;
 	this.isPlayer = 0;
 	this.ctor_name = "nil";
+	this.extdata = {};
+	this.set_extdata = function(){return "";} //generate extdata
+	this.get_extdata = function(obj){return;}
+};
+
+Game_Entity.prototype.serialize = function(){
+	this.set_extdata();
+	var export_data = {};
+	export_data.pos_x = this.position.x.toString();
+	export_data.pos_y = this.position.y.toString();
+	export_data.spritename = this.sprite.src;
+	export_data.spritew = this.spritew.toString();
+	export_data.spriteh = this.spriteh.toString();
+	export_data.renderoffx = this.renderoffx.toString();
+	export_data.renderoffy = this.renderoffy.toString();
+	export_data.friction = this.friction.toString();
+	export_data.isPlayer = this.isPlayer.toString();
+	export_data.ctor_name = this.ctor_name.toString();
+	export_data.extdata = JSON.stringify(this.extdata);
+
+	return JSON.stringify(export_data);
 };
 
 Game_Entity.prototype.integrate = function(){
