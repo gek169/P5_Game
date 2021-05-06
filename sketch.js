@@ -22,7 +22,6 @@ let renderOffset;
 let renderOffsetSaved_Gameplay; //when switch between modes, the render offset may be changed.
 let renderOffsetSaved_Editor; //when switch between modes
 let editor_is_active = false;
-let wintx; let winty;
 let js_file_stack = [];
 
 function onclick_hook(){}
