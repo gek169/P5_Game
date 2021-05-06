@@ -8,7 +8,7 @@
 	global_vars.score = 1000;
 	assetman.click_sound = loadSound('assets/click.wav');
 	//IMAGES
-	assetman.backg = loadImage('assets/texture16.png');
+	
 	assetman.aball = loadImage('assets/aball.png');
 	assetman.ahead1 = loadImage('assets/Army_Head_1.png');
 	//ANIMATIONS
@@ -28,25 +28,6 @@
 	console.log("LOADING LEVEL PRELOAD_RUN!!!!");
 }
 
-function prepImage(){
-	let bffr = createGraphics(assetman.backg.width, assetman.backg.height);
-		bffr.background(255);
-		bffr.image(assetman.backg, 0, 0);
-		let d = bffr.pixelDensity();
-		bffr.loadPixels();
-		for(let i = 0; i < bffr.width * bffr.height * 4 * d  * d; i+=4){
-			bffr.pixels[i+0] = bffr.pixels[i+0] * 0.5;
-			bffr.pixels[i+1] = bffr.pixels[i+1] * 0.5;
-			bffr.pixels[i+2] = bffr.pixels[i+2] * 1.0;
-			bffr.pixels[i+3] = 255;
-		}
-		bffr.updatePixels();
-		bffr.filter(DILATE);
-		bffr.filter(POSTERIZE, 5);
-	assetman.backg = bffr.get();
-	bffr = 0; //explicit destruction.
-}
-
 
 //This is provided by the engine.
 function onclick_hook(){
@@ -61,27 +42,50 @@ function setup_bighead(obj){
 
 //this is provided by the engine.
 function setup_hook(){
-  pixelDensity(1);
-  cnv = createCanvas(850, 550);
-  renderOffset = createVector(0,0);
-  frameRate(60);
-  prepImage();
-  entity_system = new ESystem();
-  entity_system.render_background = function(){
-  	  	background(51);
-  		image(assetman.backg, 0, 0);
-  }
-  entity_system.addEntity(
-  					createVector(100,100),  //initial position
-  						10.0,  //mass
-  						30.0, 0.0, //radius1, radius2. if radius2 is zero, this is a sphere.
-  						0.94,  //friction- 1=no friction, 0=velocity immediately drops to zero.
-  						//assetman.ahead1, //sprite
-  						40,40, //spritew, spriteh
-  						0,-1, //render offsets
-  						1//isPlayer
-  						);
-  setup_player(entity_system.entities[0]);
+	pixelDensity(1);
+	cnv = createCanvas(850, 550);
+	renderOffset = createVector(0,0);
+	frameRate(60);
+	global_vars.can_continue = 0;
+	assetman.backg = loadImage('assets/texture16.png', img=>
+
+		{	assetman.backg = img;
+			console.log("Preparing image...");
+			let bffr = createGraphics(assetman.backg.width, assetman.backg.height);
+				bffr.pixelDensity(1);
+				bffr.image(assetman.backg, 0, 0);
+				bffr.loadPixels();
+				for(let i = 0; i < bffr.width * bffr.height * 4; i+=4){
+					bffr.pixels[i+0] = bffr.pixels[i+0] * 0.5;
+					bffr.pixels[i+1] = bffr.pixels[i+1] * 0.5;
+					bffr.pixels[i+2] = bffr.pixels[i+2] * 1.0;
+					bffr.pixels[i+3] = 255;
+				}
+				bffr.updatePixels();
+				bffr.filter(DILATE);
+				bffr.filter(POSTERIZE, 5);
+			assetman.backg = bffr.get();
+			bffr = 0; //explicit destruction.
+		}
+	);
+	console.log(assetman.backg);
+	
+	entity_system = new ESystem();
+	entity_system.render_background = function(){
+		background(51);
+		image(assetman.backg, 0, 0);
+	}
+		entity_system.addEntity(
+		createVector(100,100),  //initial position
+		10.0,  //mass
+		30.0, 0.0, //radius1, radius2. if radius2 is zero, this is a sphere.
+		0.94,  //friction- 1=no friction, 0=velocity immediately drops to zero.
+		//assetman.ahead1, //sprite
+		40,40, //spritew, spriteh
+		0,-1, //render offsets
+		1//isPlayer
+		);
+  		setup_player(entity_system.entities[0]);
   
 
   entity_system.addEntity(createVector(200,100), 
@@ -92,19 +96,19 @@ function setup_hook(){
       						0,0,
       						0
       					);
-  setup_collideable_test(entity_system.entities[entity_system.entities.length-1]);
+	setup_collideable_test(entity_system.entities[entity_system.entities.length-1]);
 
 	entity_system.addEntity(createVector(280,100), 
       						0.0, 100.0, 100.0, 0.94, 100,100,0,0,0);
     setup_bighead(entity_system.entities[entity_system.entities.length-1]);
 
-  entity_system.addEntity(createVector(200,200),
+	entity_system.addEntity(createVector(200,200),
         						100.0, 80.0, 0.0, 0.94, 80,80,0,0,0);
- for(let i = 0; i < 2000; i++){
-  entity_system.addParticle(createVector(random(10,width-10),random(10,height-10)),
-    						random(0.1,0.8), 10.0, 0.0, random(0.99, 1.0), 10,10,0,0,0);
-  setup_aball_particle(entity_system.particles[entity_system.particles.length-1]);
- }
+	for(let i = 0; i < 2000; i++){
+		entity_system.addParticle(createVector(random(10,width-10),random(10,height-10)),
+			random(0.1,0.8), 10.0, 0.0, random(0.99, 1.0), 10,10,0,0,0);
+		setup_aball_particle(entity_system.particles[entity_system.particles.length-1]);
+	}
 
 }
 

@@ -22,6 +22,7 @@ function onclick_hook(){}
 //function setup_hook(){}
 //function game_logic(){}
 
+
 function get_and_run(theURL){
 	var xmlHttp = new XMLHttpRequest();
 		xmlHttp.open( "GET", theURL, false ); //synchronous
@@ -61,6 +62,7 @@ $("#exportLvlBtn").click(function(){
 	$("#exportLvlTxt").val(JSON.stringify(huge_thing));
 });
 $("#importLvlBtn").click(function(){
+	noLoop();
 	let huge_thing = {};
 	huge_thing = JSON.parse($("#exportLvlTxt").val());
 	let local_js_file_stack = JSON.parse(huge_thing.js_file_stack);
@@ -153,6 +155,7 @@ $("#importLvlBtn").click(function(){
 			}
 			entity_system.fgrenderables[entity_system.fgrenderables.length-1].get_extdata();
 		}
+	loop();
 });
 /*
 $("#changeToolBtn").click(function(){
@@ -229,7 +232,7 @@ function preload(){
 
 function setup() {
 	url = getURL();
-	selectedEntity = {};
+	selectedEntity = 0;
 	renderOffsetSaved_Editor = createVector(0,0);
 	renderOffsetSaved_Gameplay = createVector(0,0);
 	setup_hook();
