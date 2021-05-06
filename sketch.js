@@ -73,7 +73,7 @@ function exportLvl(){
 }
 
 function importLvl(str){
-	noLoop(); selectedEntity = 0; selected_layer = 0; selected_i = -1;
+	noLoop(); selectedEntity = 0; selected_i = -1;
 	let huge_thing = {};
 	//huge_thing = JSON.parse($("#exportLvlTxt").val());
 	huge_thing = JSON.parse(str);
