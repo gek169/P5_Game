@@ -38,7 +38,9 @@ function get_and_run(theURL){
 	js_file_stack.push(theURL);
 }
 
-$("#exportLvlBtn").click(function(){
+
+
+function exportLvl(){
 	let huge_thing = {};
 	huge_thing.globals = JSON.stringify(global_vars);
 	huge_thing.renderOffset_x = renderOffset.x;
@@ -65,12 +67,16 @@ $("#exportLvlBtn").click(function(){
 	for(let i = 0; i < entity_system.particles.length; i++){
 		huge_thing.particles.push(entity_system.particles[i].serialize())
 	}
-	$("#exportLvlTxt").val(JSON.stringify(huge_thing));
-});
-$("#importLvlBtn").click(function(){
+	let bruh = JSON.stringify(huge_thing);
+	$("#exportLvlTxt").val(bruh);
+	return bruh;
+}
+
+function importLvl(str){
 	noLoop(); selectedEntity = 0; selected_layer = 0; selected_i = -1;
 	let huge_thing = {};
-	huge_thing = JSON.parse($("#exportLvlTxt").val());
+	//huge_thing = JSON.parse($("#exportLvlTxt").val());
+	huge_thing = JSON.parse(str);
 	let local_js_file_stack = JSON.parse(huge_thing.js_file_stack);
 	for(let j = 0; j < local_js_file_stack.length; j++) {
 		get_and_run(local_js_file_stack[j]);
@@ -165,6 +171,17 @@ $("#importLvlBtn").click(function(){
 			entity_system.fgrenderables[entity_system.fgrenderables.length-1].get_extdata();
 		}
 	loop();
+}
+
+$("#saveLvlBtn").click(function(){
+	let a = exportLvl();
+	let q = [];
+	q.push(a);
+	save(q, "lvl.txt");
+});
+$("#exportLvlBtn").click(exportLvl);
+$("#importLvlBtn").click(function(){
+	importLvl($("#exportLvlTxt").val());
 });
 /*
 $("#changeToolBtn").click(function(){
