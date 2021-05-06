@@ -14,7 +14,7 @@ let renderOffsetSaved_Gameplay; //when switch between modes, the render offset m
 let renderOffsetSaved_Editor; //when switch between modes
 let editor_is_active = false;
 const entity_max_vel = 500;
-const player_max_vel = 4;
+
 let wintx; let winty;
 let js_file_stack = [];
 

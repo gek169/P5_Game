@@ -1,6 +1,7 @@
 {
-	global_vars = {}; cnv = {}; player = 0; renderOffset = createVector(0,0); 
+	global_vars = {}; cnv = {}; renderOffset = createVector(0,0); 
 	assetman = {}; //explicitly delete anything that existed before us.
+	global_vars.player_max_vel = 4;
 //SOUNDS
 	global_vars.score = 1000;
 	assetman.click_sound = loadSound('assets/click.wav');
@@ -139,18 +140,19 @@ function playClick(){assetman.click_sound.play();}
 
 function setup_player(obj){
   obj.ctor_name = "player"
-  player = 0;
-  player = obj;
-  player.sprite = assetman.ahead1;
-  player.currentAnimFrame = 0;
-  player.isPlayingAnim = 0;
-  player.render = player_render;
-  player.behavior = player_behavior;
-  player.framesOnCurrentAnim = 6;
-  player.movement_anim_frames = assetman.player_anim_frames; 
+  assetman.player = 0;
+  assetman.player = obj;
+  assetman.player.sprite = assetman.ahead1;
+  assetman.player.currentAnimFrame = 0;
+  assetman.player.isPlayingAnim = 0;
+  assetman.player.render = player_render;
+  assetman.player.behavior = player_behavior;
+  assetman.player.framesOnCurrentAnim = 6;
+  assetman.player.movement_anim_frames = assetman.player_anim_frames; 
 }
 function player_behavior(){
 	let ppos = this.position.copy();
+	let player_max_vel = global_vars.player_max_vel;
 	ppos.sub(renderOffset);
 	if(ppos.x + this.boxdims.x > width-70) renderOffset.x += constrain(1.04*this.velocity.x,1,player_max_vel);
 	if(ppos.x - this.boxdims.x < 70) renderOffset.x += constrain(1.04*this.velocity.x,-player_max_vel,-1);
@@ -172,6 +174,7 @@ function player_behavior(){
 }
 
 function player_render(){
+	let player_max_vel = global_vars.player_max_vel;
 	if(this.velocity.magSq() > (player_max_vel * player_max_vel)/4.0){
 		if(!this.isPlayingAnim){this.isPlayingAnim = 1; this.currentAnimFrame = 0;}
 		else{
