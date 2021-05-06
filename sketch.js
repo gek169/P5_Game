@@ -515,14 +515,12 @@ Game_Entity.prototype.render_internal = function(){
 	let rpos = this.position.copy();
 	rpos.sub(renderOffset);
 	if(this.sprite)
-		image(this.sprite, rpos.x + this.renderoffx - this.spritew/2, rpos.y  + this.renderoffy - this.spriteh/2, this.spritew, this.spriteh);
+		image(this.sprite, rpos.x + this.renderoffx, rpos.y  + this.renderoffy, this.spritew, this.spriteh);
 }
 
 Game_Entity.prototype.render = Game_Entity.prototype.render_internal;
-//
 Game_Entity.prototype.behavior = function(){};
 Game_Entity.prototype.oncollide = function(other, diff){};
-
 Game_Entity.prototype.collide = function(other){
 	if(this.mass <= 0 && other.mass <= 0) return 0; //Static objects do not need to be processed together.
 	/*if(this.boxdims.x <= 0 || other.boxdims.x <= 0) return 0;*/ //Object with no collision.
@@ -677,7 +675,6 @@ Game_Entity.prototype.collide = function(other){
 			this.velocity.add(vec2);
 		}
 		if(other.mass > 0){
-			//let vec2 = vec.copy();
 			if(this.mass != 0)
 				vec.mult(mass_ratio_me);
 			other.position.add(vec);
@@ -749,7 +746,9 @@ ESystem.prototype.integrate = function(){
 }
 ESystem.prototype.render_background = function(){}
 ESystem.prototype.render = function(){
+	imageMode(CORNER);
 	this.render_background();
+	imageMode(CENTER);
 	for(let i = this.renderables.length - 1; i>=0; i--){
 		this.renderables[i].render();
 		if((selected_layer == 0) && editor_is_active){
