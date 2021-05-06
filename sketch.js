@@ -68,7 +68,7 @@ $("#exportLvlBtn").click(function(){
 	$("#exportLvlTxt").val(JSON.stringify(huge_thing));
 });
 $("#importLvlBtn").click(function(){
-	noLoop();
+	noLoop(); selectedEntity = 0; selected_layer = 0; selected_i = -1;
 	let huge_thing = {};
 	huge_thing = JSON.parse($("#exportLvlTxt").val());
 	let local_js_file_stack = JSON.parse(huge_thing.js_file_stack);
