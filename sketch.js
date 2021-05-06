@@ -1,4 +1,4 @@
-let cnv;
+let cnv = 0;
 let url;
 let entity_system;
 let dummy_img;
@@ -16,14 +16,11 @@ let editor_is_active = false;
 const entity_max_vel = 500;
 const player_max_vel = 4;
 let wintx; let winty;
+let js_file_stack = [];
 
-//createCanvas(windowWidth, windowHeight);
-//function windowResized() {
-//  resizeCanvas(windowWidth, windowHeight);
-//}
-
-
-
+function onclick_hook(){}
+//function setup_hook(){}
+//function game_logic(){}
 
 function get_and_run(theURL){
 	var xmlHttp = new XMLHttpRequest();
@@ -31,11 +28,20 @@ function get_and_run(theURL){
 		xmlHttp.send( null );
 	let e = eval;
 	e(xmlHttp.responseText);
+	js_file_stack.push(theURL);
 }
 
 $("#exportLvlBtn").click(function(){
 	let huge_thing = {};
 	huge_thing.globals = JSON.stringify(global_vars);
+	huge_thing.renderOffset_x = renderOffset.x;
+	huge_thing.renderOffsetSaved_Gameplay_x = renderOffsetSaved_Gameplay.x;
+	huge_thing.renderOffsetSaved_Editor_x = renderOffsetSaved_Editor.x;
+	huge_thing.renderOffset_y = renderOffset.y;
+	huge_thing.renderOffsetSaved_Gameplay_y = renderOffsetSaved_Gameplay.y;
+	huge_thing.renderOffsetSaved_Editor_y = renderOffsetSaved_Editor.y;
+	huge_thing.editor_is_active = editor_is_active;
+	huge_thing.js_file_stack = JSON.stringify(js_file_stack);
 	huge_thing.renderables = [];
 	huge_thing.fgrenderables = [];
 	huge_thing.entities = [];
@@ -53,6 +59,100 @@ $("#exportLvlBtn").click(function(){
 		huge_thing.particles.push(entity_system.particles[i].serialize())
 	}
 	$("#exportLvlTxt").val(JSON.stringify(huge_thing));
+});
+$("#importLvlBtn").click(function(){
+	let huge_thing = {};
+	huge_thing = JSON.parse($("#exportLvlTxt").val());
+	let local_js_file_stack = JSON.parse(huge_thing.js_file_stack);
+	for(let j = 0; j < local_js_file_stack.length; j++) {get_and_run(local_js_file_stack[j]);}
+	setup();//trigger setup.
+	js_file_stack = local_js_file_stack;
+	
+
+	global_vars = JSON.parse(huge_thing.globals);
+	renderOffset = createVector(huge_thing.renderOffset_x, huge_thing.renderOffset_y);
+	renderOffsetSaved_Gameplay = createVector(huge_thing.renderOffsetSaved_Gameplay_x, huge_thing.renderOffsetSaved_Gameplay_y);
+	renderOffsetSaved_Editor = createVector(huge_thing.renderOffsetSaved_Editor_x, huge_thing.renderOffsetSaved_Editor_y);
+	entity_system.renderables = [];
+	entity_system.fgrenderables = [];
+	entity_system.entities = [];
+	entity_system.particles = [];
+	//renderables
+	for(let i = 0; i < huge_thing.renderables.length; i++){
+		let active = JSON.parse(huge_thing.renderables[i]);
+		
+		entity_system.addRenderable(
+			createVector(parseFloat(active.pos_x), parseFloat(active.pos_y)),
+			parseFloat(active.mass),
+			parseFloat(active.boxdims_x), parseFloat(active.boxdims_y),
+			parseFloat(active.friction),
+			parseFloat(active.spritew),
+			parseFloat(active.spriteh),
+			parseFloat(active.renderoffx),
+			parseFloat(active.renderoffy)
+		);
+		if(active.ctor_name != "nil"){
+			eval("setup_"+active.ctor_name)(entity_system.renderables[entity_system.renderables.length-1]);
+		}
+		entity_system.renderables[entity_system.renderables.length-1].get_extdata();
+	}
+
+	//entities
+	for(let i = 0; i < huge_thing.entities.length; i++){
+		let active = JSON.parse(huge_thing.entities[i]);
+		entity_system.addEntity(
+			createVector(parseFloat(active.pos_x), parseFloat(active.pos_y)),
+			parseFloat(active.mass),
+			parseFloat(active.boxdims_x), 
+			parseFloat(active.boxdims_y),
+			parseFloat(active.friction),
+			parseFloat(active.spritew),
+			parseFloat(active.spriteh),
+			parseFloat(active.renderoffx),
+			parseFloat(active.renderoffy)
+		);
+		if(active.ctor_name != "nil"){
+			eval("setup_"+active.ctor_name)(entity_system.entities[entity_system.entities.length-1]);
+		}
+		entity_system.entities[entity_system.entities.length-1].get_extdata();
+	}
+	//entities
+	for(let i = 0; i < huge_thing.particles.length; i++){
+		let active = JSON.parse(huge_thing.particles[i]);
+		entity_system.addParticle(
+			createVector(parseFloat(active.pos_x), parseFloat(active.pos_y)),
+			parseFloat(active.mass),
+			parseFloat(active.boxdims_x), parseFloat(active.boxdims_y),
+			parseFloat(active.friction),
+			parseFloat(active.spritew),
+			parseFloat(active.spriteh),
+			parseFloat(active.renderoffx),
+			parseFloat(active.renderoffy)
+		);
+		if(active.ctor_name != "nil"){
+			eval("setup_"+active.ctor_name)(entity_system.particles[entity_system.particles.length-1]);
+			
+		}
+		entity_system.particles[entity_system.particles.length-1].get_extdata();
+	}
+	//fgrenderables
+		for(let i = 0; i < huge_thing.fgrenderables.length; i++){
+			let active = JSON.parse(huge_thing.fgrenderables[i]);
+			entity_system.addFgRenderable(
+				createVector(parseFloat(active.pos_x), parseFloat(active.pos_y)),
+				parseFloat(active.mass),
+				parseFloat(active.boxdims_x), parseFloat(active.boxdims_y),
+				parseFloat(active.friction),
+				parseFloat(active.spritew),
+				parseFloat(active.spriteh),
+				parseFloat(active.renderoffx),
+				parseFloat(active.renderoffy)
+			);
+			if(active.ctor_name != "nil"){
+				eval("setup_"+active.ctor_name)(entity_system.fgrenderables[entity_system.fgrenderables.length-1]);
+			}
+			entity_system.fgrenderables[entity_system.fgrenderables.length-1].get_extdata();
+		}
 });
 /*
 $("#changeToolBtn").click(function(){
@@ -329,7 +429,7 @@ let Game_Entity = function(position, mass, radius, radius2, friction, spritew, s
 	this.renderoffx = renderoffx;
 	this.renderoffy = renderoffy;
 	this.friction = friction;
-	this.isPlayer = 0;
+	//this.isPlayer = 0;
 	this.ctor_name = "nil";
 	this.extdata = {};
 	this.set_extdata = function(){return;} //generate extdata from our members.
@@ -341,12 +441,15 @@ Game_Entity.prototype.serialize = function(){
 	var export_data = {};
 	export_data.pos_x = this.position.x.toString();
 	export_data.pos_y = this.position.y.toString();
+	export_data.boxdims_x = (this.boxdims.x*2).toString();
+	export_data.boxdims_y = (this.boxdims.y*2).toString();
+	export_data.mass = this.mass.toString();
 	export_data.spritew = this.spritew.toString();
 	export_data.spriteh = this.spriteh.toString();
 	export_data.renderoffx = this.renderoffx.toString();
 	export_data.renderoffy = this.renderoffy.toString();
 	export_data.friction = this.friction.toString();
-	export_data.isPlayer = this.isPlayer.toString();
+	//export_data.isPlayer = this.isPlayer.toString();
 	export_data.ctor_name = this.ctor_name.toString();
 	export_data.extdata = JSON.stringify(this.extdata);
 	return JSON.stringify(export_data);

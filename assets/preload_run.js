@@ -1,6 +1,11 @@
+
+
+//run right now.
 {
-	global_vars = {}; cnv = {}; player = {}; renderOffset = {}; assetman = {}; //explicitly delete anything that existed before us.
+	global_vars = {}; cnv = {}; player = 0; renderOffset = createVector(0,0); 
+	assetman = {}; //explicitly delete anything that existed before us.
 //SOUNDS
+	global_vars.score = 1000;
 	assetman.click_sound = loadSound('assets/click.wav');
 	//IMAGES
 	assetman.backg = loadImage('assets/texture16.png');
@@ -20,41 +25,44 @@
 	assetman.player_anim_frames.push(
 		assetman.player_anim_frames[1]
 	);
+	console.log("LOADING LEVEL PRELOAD_RUN!!!!");
 }
 
-function prepImage(obj){
+function prepImage(){
 	let bffr = createGraphics(assetman.backg.width, assetman.backg.height);
-	//bffr.pixelDensity(1);
-	bffr.background(101);
-	bffr.image(assetman.backg, 0, 0);
-	let d = bffr.pixelDensity();
-	bffr.loadPixels();
-	for(let i = 0; i < bffr.width * bffr.height * 4 * d  * d; i+=4){
-		bffr.pixels[i+0] = bffr.pixels[i+0] * 0.5;
-		bffr.pixels[i+1] = bffr.pixels[i+1] * 0.5;
-		bffr.pixels[i+2] = bffr.pixels[i+2] * 1.0;
-		bffr.pixels[i+3] = 255;
-	}
-	bffr.updatePixels();
-	bffr.filter(DILATE);
-	bffr.filter(POSTERIZE, 5);
+		bffr.background(255);
+		bffr.image(assetman.backg, 0, 0);
+		let d = bffr.pixelDensity();
+		bffr.loadPixels();
+		for(let i = 0; i < bffr.width * bffr.height * 4 * d  * d; i+=4){
+			bffr.pixels[i+0] = bffr.pixels[i+0] * 0.5;
+			bffr.pixels[i+1] = bffr.pixels[i+1] * 0.5;
+			bffr.pixels[i+2] = bffr.pixels[i+2] * 1.0;
+			bffr.pixels[i+3] = 255;
+		}
+		bffr.updatePixels();
+		bffr.filter(DILATE);
+		bffr.filter(POSTERIZE, 5);
 	assetman.backg = bffr.get();
 	bffr = 0; //explicit destruction.
 }
 
 
-
+//This is provided by the engine.
 function onclick_hook(){
 	
 }
 
 
+function setup_bighead(obj){
+	obj.sprite = assetman.ahead1;
+	obj.ctor_name = "bighead";
+}
 
+//this is provided by the engine.
 function setup_hook(){
   pixelDensity(1);
-  cnv = createCanvas(1000, 550);
-  //cnv.mousePressed(playClick);
-  //system = new ParticleSystem(createVector(width / 2, 50));
+  cnv = createCanvas(850, 550);
   renderOffset = createVector(0,0);
   frameRate(60);
   prepImage();
@@ -85,16 +93,13 @@ function setup_hook(){
       						0
       					);
   setup_collideable_test(entity_system.entities[entity_system.entities.length-1]);
-  entity_system.entities[entity_system.entities.length-1].sprite = assetman.ahead1;
-  entity_system.entities[entity_system.entities.length-1].behavior = function(){
-  	if(this.was_colliding_frames_ago>0)this.was_colliding_frames_ago--;
-  };
+
 	entity_system.addEntity(createVector(280,100), 
       						0.0, 100.0, 100.0, 0.94, 100,100,0,0,0);
-    entity_system.entities[entity_system.entities.length-1].sprite = assetman.ahead1;
+    setup_bighead(entity_system.entities[entity_system.entities.length-1]);
+
   entity_system.addEntity(createVector(200,200),
         						100.0, 80.0, 0.0, 0.94, 80,80,0,0,0);
-    entity_system.entities[entity_system.entities.length-1].sprite = assetman.aball;
  for(let i = 0; i < 2000; i++){
   entity_system.addParticle(createVector(random(10,width-10),random(10,height-10)),
     						random(0.1,0.8), 10.0, 0.0, random(0.99, 1.0), 10,10,0,0,0);
@@ -104,12 +109,12 @@ function setup_hook(){
 }
 
 function setup_aball_particle(obj){
-	obj.accel = createVector(0,
-	  	-random(0.001, 0.02));
+	obj.accel = createVector(0,-random(0.001, 0.02));
 	obj.ctor_name = "aball_particle";	
 	obj.sprite = assetman.aball;
 }
 
+//this is provided by the engine.
 function game_logic(){
 	for(let i = 0; i < entity_system.particles.length; i++){
 		let ent = entity_system.particles[i];
@@ -134,6 +139,7 @@ function playClick(){assetman.click_sound.play();}
 
 function setup_player(obj){
   obj.ctor_name = "player"
+  player = 0;
   player = obj;
   player.sprite = assetman.ahead1;
   player.currentAnimFrame = 0;
@@ -141,7 +147,7 @@ function setup_player(obj){
   player.render = player_render;
   player.behavior = player_behavior;
   player.framesOnCurrentAnim = 6;
-  player.movement_anim_frames = assetman.player_anim_frames; assetman.player_anim_frames = 0;
+  player.movement_anim_frames = assetman.player_anim_frames; 
 }
 function player_behavior(){
 	let ppos = this.position.copy();
@@ -188,14 +194,18 @@ function setup_collideable_test(obj){
 	obj.sprite = assetman.aball;
 	obj.was_colliding_frames_ago = 0;
 	obj.oncollide = function(other, diff){
-		if(diff > 3)
-	  	if(this.was_colliding_frames_ago <= 0){
-	  		playClick();
-	  		this.was_colliding_frames_ago = 30;
-	  	}
-	  };
-   obj.behavior = function(){
-     	if(this.was_colliding_frames_ago>0)this.was_colliding_frames_ago--;
-     };
-     obj.ctor_name = "collideable_test";
+	if(diff > 3)
+		if(this.was_colliding_frames_ago <= 0){
+			playClick();
+			this.was_colliding_frames_ago = 20;
+		}
+	};
+	obj.behavior = function(){
+	 	if(this.was_colliding_frames_ago>0)this.was_colliding_frames_ago--;
+	 };
+	obj.ctor_name = "collideable_test";
+	obj.sprite = assetman.ahead1;
+	obj.behavior = function(){
+		if(this.was_colliding_frames_ago>0)this.was_colliding_frames_ago--;
+	};
 }
