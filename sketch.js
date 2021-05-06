@@ -64,8 +64,11 @@ $("#importLvlBtn").click(function(){
 	let huge_thing = {};
 	huge_thing = JSON.parse($("#exportLvlTxt").val());
 	let local_js_file_stack = JSON.parse(huge_thing.js_file_stack);
-	for(let j = 0; j < local_js_file_stack.length; j++) {get_and_run(local_js_file_stack[j]);}
-	setup();//trigger setup.
+	for(let j = 0; j < local_js_file_stack.length; j++) {
+		get_and_run(local_js_file_stack[j]);
+		setup();//trigger setup.
+	}
+	
 	js_file_stack = local_js_file_stack;
 	
 
