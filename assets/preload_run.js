@@ -1,6 +1,3 @@
-
-
-//run right now.
 {
 	global_vars = {}; cnv = {}; player = 0; renderOffset = createVector(0,0); 
 	assetman = {}; //explicitly delete anything that existed before us.
@@ -25,7 +22,6 @@
 	assetman.player_anim_frames.push(
 		assetman.player_anim_frames[1]
 	);
-	console.log("LOADING LEVEL PRELOAD_RUN!!!!");
 }
 
 
