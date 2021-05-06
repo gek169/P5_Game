@@ -13,8 +13,6 @@ let renderOffset;
 let renderOffsetSaved_Gameplay; //when switch between modes, the render offset may be changed.
 let renderOffsetSaved_Editor; //when switch between modes
 let editor_is_active = false;
-const entity_max_vel = 500;
-
 let wintx; let winty;
 let js_file_stack = [];
 
@@ -416,6 +414,8 @@ function draw() {
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			Engine code
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+<NOTE: this code can be re-used for other projects. Especially the collision detection code.>
 */
 
 
@@ -459,6 +459,7 @@ Game_Entity.prototype.serialize = function(){
 };
 
 Game_Entity.prototype.integrate = function(){
+	const entity_max_vel = 500; //CHANGE THIS
 	this.velocity.add(this.accel);
 	if(this.velocity.magSq() > entity_max_vel * entity_max_vel){
 		//this.velocity.normalize(); this.velocity.mult(entity_max_vel);
