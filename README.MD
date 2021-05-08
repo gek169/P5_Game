@@ -8,7 +8,9 @@ This makes it a superb choice for most game development, where in most cases, pe
 This isn't the right choice if you want to write the next realistic immersive 3d game, of course.
 
 
-Repository available to you under the MiT license, P5.js and associated materials are LGPL. the P5-reference is
-CC non-commercial share-alike, which means essentially that before creating a commercial project,
+See LICENSE for the license of this repository's code.
 
-you should remove the p5-reference included with this repository.
+The p5 reference is copied here for development convenience. it is non-commercial sharealike, so remove it
+from the repository before using it.
+
+P5.js and p5.sound.js are both under the LGPL, which is MIT compatible.
