@@ -183,20 +183,6 @@ $("#exportLvlBtn").click(exportLvl);
 $("#importLvlBtn").click(function(){
 	importLvl($("#exportLvlTxt").val());
 });
-/*
-$("#changeToolBtn").click(function(){
-	if(!editor_is_active) return;
-	editor_tool++; editor_tool %= 3;
-	if(editor_tool == 0)
-		$("#toolname").text("Move");
-	else if(editor_tool == 1)
-		$("#toolname").text("Place");
-	else if(editor_tool == 2)
-		$("#toolname").text("Remove");
-	else
-		$("#toolname").text("Invalid");
-});
-*/
 
 $("#changeInteractTypeBtn").click(function(){
 	if(!editor_is_active) return;
@@ -261,6 +247,10 @@ function setup() {
 	selectedEntity = 0;
 	renderOffsetSaved_Editor = createVector(0,0);
 	renderOffsetSaved_Gameplay = createVector(0,0);
+	renderOffset = createVector(0,0);
+	pixelDensity(1);
+	cnv = createCanvas(850, 550);
+	frameRate(60);
 	setup_hook();
 	cnv.mousePressed(engine_onclick);
 }
@@ -336,7 +326,8 @@ function draw() {
 		}
 		if(!keyIsDown(67)) {engine_toggle_create = 0;}
 		if(keyIsDown(68)){selectedEntity = 0;}
-		if(!engine_toggle_create && keyIsDown(67) && !selectedEntity){ //Immediately create an entity.
+		if(!engine_toggle_create && keyIsDown(67) && !selectedEntity && 
+		(mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height)){ //Immediately create an entity.
 			engine_toggle_create = 1;
 			let setup_func_name = "setup_" + $("#tileToPlace").val();
 			let mass = parseFloat($("#mass").val());
@@ -398,7 +389,8 @@ function draw() {
 			}
 			editor_tool = 1;
 		}
-		if(selectedEntity && keyIsDown(77)){
+		if(selectedEntity && keyIsDown(77)&& 
+				(mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height)){
 			editor_tool = 0;
 			selectedEntity.position.x = mouseX + renderOffset.x;
 			selectedEntity.position.y = mouseY + renderOffset.y;
@@ -409,7 +401,8 @@ function draw() {
 				selectedEntity.position.y = pf * Math.floor(selectedEntity.position.y / pf);
 			}
 		}
-		if(selectedEntity && keyIsDown(46) ){
+		if(selectedEntity && keyIsDown(46) && 
+				(mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height)){
 			editor_tool = 2;
 			if(selected_layer == 0){
 				entity_system.removeRenderable(selected_i);

@@ -1,5 +1,5 @@
 {
-	global_vars = {}; cnv = {}; renderOffset = createVector(0,0); 
+	global_vars = {}; renderOffset = createVector(0,0); 
 	assetman = {}; //explicitly delete anything that existed before us.
 	global_vars.player_max_vel = 4;
 //SOUNDS
@@ -39,13 +39,11 @@ function setup_bighead(obj){
 
 //this is provided by the engine.
 function setup_hook(){
-	pixelDensity(1);
-	cnv = createCanvas(850, 550);
+	renderOffsetSaved_Editor = createVector(0,0);
+	renderOffsetSaved_Gameplay = createVector(0,0);
 	renderOffset = createVector(0,0);
-	frameRate(60);
 	global_vars.can_continue = 0;
 	assetman.backg = loadImage('assets/texture16.png', img=>
-
 		{	assetman.backg = img;
 			console.log("Preparing image...");
 			let bffr = createGraphics(assetman.backg.width, assetman.backg.height);
@@ -85,7 +83,7 @@ function setup_hook(){
   		setup_player(entity_system.entities[0]);
   
 
-  entity_system.addEntity(createVector(200,100), 
+	entity_system.addEntity(createVector(200,100), 
       						10.0, 
       						40.0, 40.0, 
       						0.98, 
@@ -101,7 +99,7 @@ function setup_hook(){
 
 	entity_system.addEntity(createVector(200,200),
         						100.0, 80.0, 0.0, 0.94, 80,80,0,0,0);
-	for(let i = 0; i < 2000; i++){
+	for(let i = 0; i < 200; i++){
 		entity_system.addParticle(createVector(random(10,width-10),random(10,height-10)),
 			random(0.1,0.8), 10.0, 0.0, random(0.99, 1.0), 10,10,0,0,0);
 		setup_aball_particle(entity_system.particles[entity_system.particles.length-1]);
