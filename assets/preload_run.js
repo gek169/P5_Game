@@ -115,6 +115,7 @@ function setup_aball_particle(obj){
 
 //this is provided by the engine.
 function game_logic(){
+	entity_system.integrate();
 	for(let i = 0; i < entity_system.particles.length; i++){
 		let ent = entity_system.particles[i];
 		if(ent.position.y - renderOffset.y < 0 || !((ent.position.x-renderOffset.x) < width+20 && (ent.position.x-renderOffset.x) > -20)){

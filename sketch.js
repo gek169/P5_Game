@@ -303,7 +303,6 @@ let engine_toggle_create = 0;
 
 function draw() {
 	if(!editor_is_active){
-		entity_system.integrate();
 		game_logic();
 	} else {
 		//editor logic goes here. TODO.
