@@ -337,7 +337,6 @@ function draw() {
 			let SpriteH = parseFloat($("#SpriteH").val());
 			let renderOffsetX = parseFloat($("#renderOffsetX").val());
 			let renderOffsetY = parseFloat($("#renderOffsetY").val());
-			let isPlayer = parseFloat($("#isPlayer").val());
 			let vec = createVector(mouseX + renderOffset.x, 
 									mouseY + renderOffset.y);
 			let active_array;
@@ -346,7 +345,7 @@ function draw() {
 					entity_system.addRenderable(
 						vec,
 						mass, r1, r2, frict, 
-						SpriteW, SpriteH, renderOffsetX, renderOffsetY, isPlayer
+						SpriteW, SpriteH, renderOffsetX, renderOffsetY
 					);
 					//entity_system.renderables[entity_system.renderables.length - 1].sprite = eval(spritename);
 					active_array = entity_system.renderables;
@@ -356,7 +355,7 @@ function draw() {
 					entity_system.addEntity(
 						vec,
 						mass, r1, r2, frict, 
-						SpriteW, SpriteH, renderOffsetX, renderOffsetY, isPlayer
+						SpriteW, SpriteH, renderOffsetX, renderOffsetY
 					);
 					//entity_system.entities[entity_system.entities.length - 1].sprite = eval(spritename);
 					active_array = entity_system.entities;
@@ -366,7 +365,7 @@ function draw() {
 					entity_system.addParticle(
 											vec,
 											mass, r1, r2, frict, 
-											SpriteW, SpriteH, renderOffsetX, renderOffsetY, isPlayer
+											SpriteW, SpriteH, renderOffsetX, renderOffsetY
 										);
 					//entity_system.particles[entity_system.particles.length - 1].sprite = eval(spritename);
 					active_array = entity_system.particles;
@@ -375,7 +374,7 @@ function draw() {
 				entity_system.addFgRenderable(
 										vec,
 										mass, r1, r2, frict, 
-										SpriteW, SpriteH, renderOffsetX, renderOffsetY, isPlayer
+										SpriteW, SpriteH, renderOffsetX, renderOffsetY
 									);
 				//entity_system.fgrenderables[entity_system.fgrenderables.length - 1].sprite = eval(spritename);
 				active_array = entity_system.fgrenderables;
@@ -452,7 +451,6 @@ let Game_Entity = function(position, mass, radius, radius2, friction, spritew, s
 	this.renderoffx = renderoffx;
 	this.renderoffy = renderoffy;
 	this.friction = friction;
-	//this.isPlayer = 0;
 	this.ctor_name = "nil";
 	this.extdata = {};
 	this.set_extdata = function(){return;} //generate extdata from our members.
@@ -472,7 +470,6 @@ Game_Entity.prototype.serialize = function(){
 	export_data.renderoffx = this.renderoffx.toString();
 	export_data.renderoffy = this.renderoffy.toString();
 	export_data.friction = this.friction.toString();
-	//export_data.isPlayer = this.isPlayer.toString();
 	export_data.ctor_name = this.ctor_name.toString();
 	export_data.extdata = JSON.stringify(this.extdata);
 	return JSON.stringify(export_data);
@@ -685,24 +682,20 @@ let ESystem = function(){
 	this.fgrenderables = [];
 };
 
-ESystem.prototype.addEntity = function(position, mass, radius, radius2, friction, spritew, spriteh, renderoffx, renderoffy, isPlayer){
+ESystem.prototype.addEntity = function(position, mass, radius, radius2, friction, spritew, spriteh, renderoffx, renderoffy){
 	this.entities.push(new Game_Entity(position, mass, radius, radius2, friction, spritew, spriteh, renderoffx, renderoffy));
-	this.entities[this.entities.length - 1].isPlayer = isPlayer;
 };
 
-ESystem.prototype.addRenderable = function(position, mass, radius, radius2, friction, spritew, spriteh, renderoffx, renderoffy, isPlayer){
+ESystem.prototype.addRenderable = function(position, mass, radius, radius2, friction, spritew, spriteh, renderoffx, renderoffy){
 	this.renderables.push(new Game_Entity(position, mass, radius, radius2, friction, spritew, spriteh, renderoffx, renderoffy));
-	this.renderables[this.renderables.length - 1].isPlayer = isPlayer;
 };
 
-ESystem.prototype.addFgRenderable = function(position, mass, radius, radius2, friction, spritew, spriteh, renderoffx, renderoffy, isPlayer){
+ESystem.prototype.addFgRenderable = function(position, mass, radius, radius2, friction, spritew, spriteh, renderoffx, renderoffy){
 	this.fgrenderables.push(new Game_Entity(position, mass, radius, radius2, friction, spritew, spriteh, renderoffx, renderoffy));
-	this.fgrenderables[this.renderables.length - 1].isPlayer = isPlayer;
 };
 
-ESystem.prototype.addParticle = function(position, mass, radius, radius2, friction, spritew, spriteh, renderoffx, renderoffy, isPlayer){
+ESystem.prototype.addParticle = function(position, mass, radius, radius2, friction, spritew, spriteh, renderoffx, renderoffy){
 	this.particles.push(new Game_Entity(position, mass, radius, radius2, friction, spritew, spriteh, renderoffx, renderoffy))
-	this.particles[this.particles.length - 1].isPlayer = isPlayer;
 };
 
 ESystem.prototype.removeEntity = function(i){
