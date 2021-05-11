@@ -194,7 +194,7 @@ function setup_collideable_test(obj){
 	obj.sprite = assetman.aball;
 	obj.was_colliding_frames_ago = 0;
 	obj.oncollide = function(other, diff){
-	if(diff > 3)
+	if(diff > 2)
 		if(this.was_colliding_frames_ago <= 0){
 			playClick();
 			this.was_colliding_frames_ago = 20;
