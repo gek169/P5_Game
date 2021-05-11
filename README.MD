@@ -1,5 +1,9 @@
 # Everything you need for game development in Javascript.
 
+A fully fledged 2D game engine with a minimalistic editor and extremely flexible runtime dynamicism.
+
+![editor](EditorDemo.gif)
+
 Javascript, while extremely slow, does not require recompilation for new targets and is extra-ordinarily
 portable.
 
