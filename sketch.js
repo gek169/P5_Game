@@ -386,6 +386,15 @@ function draw() {
 				eval(setup_func_name)(active_array[active_array.length - 1]);
 			}
 			editor_tool = 1;
+			let pf = parseFloat($("#PlaceFactor").val());
+						//console.log(pf);
+			{
+				let bruh = active_array[active_array.length - 1];
+				if(pf > 0 && pf <= 10000){
+					bruh.position.x = pf * Math.floor(bruh.position.x / pf);
+					bruh.position.y = pf * Math.floor(bruh.position.y / pf);
+				}
+			}
 		}
 		if(selectedEntity && keyIsDown(77)&& 
 				(mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height)){
