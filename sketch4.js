@@ -36,12 +36,12 @@ function initFluid(){
 
 $("#togglecaustics").click(function() {
 	doCaustics = !doCaustics;
-});
+})
 
 $("#dropAmount").oninput = function(){
-	drop_amount = this.value / 20.0;
-	console.log("F");
-};
+	drop_amount = $("#dropAmount").value / 20.0;
+	console.log("Detected Input!");
+}
 
 
 let toggle = false;
