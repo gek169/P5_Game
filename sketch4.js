@@ -39,7 +39,7 @@ $("#togglecaustics").click(function() {
 })
 
 $("#dropAmount").oninput = function(){
-	drop_amount = $("#dropAmount").value / 20.0;
+	drop_amount = $("#dropAmount").value / 40.0;
 	console.log("Detected Input!");
 }
 
@@ -102,7 +102,7 @@ function setup(){
 	initFluid();
 }
 
-let counter = 10;
+let counter = 15;
 function draw(){
 	clear();
 	background(128);
@@ -113,7 +113,7 @@ function draw(){
 		vstep();
 		//for(let i = 0; i < 10; i++) 
 		if(counter == 0)
-		{droplet();counter = 10;}
+		{droplet();counter = 15;}
 		if(!doCaustics)
 		{
 			for(let i = 0; i < width; i++)
