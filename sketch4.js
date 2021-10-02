@@ -36,7 +36,14 @@ $("#togglecaustics").click(function() {
 	doCaustics = !doCaustics;
 });
 
+
+let toggle = false;
 function droplet(){
+	let amount = 15;
+	toggle = !toggle;
+	if(toggle) amount = -15;
+
+	if(Math.random() < 0.5) amount = -15;
 	u[
 	Math.floor(
 		Math.random() * (width-1)
@@ -45,9 +52,7 @@ function droplet(){
 	Math.floor(
 		Math.random() * (height-1)
 	)
-	] += 15.0 
-
-	;
+	] += amount;
 }
 
 function float_to_char(f){
