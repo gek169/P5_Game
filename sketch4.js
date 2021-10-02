@@ -2,6 +2,8 @@ doCaustics=false;
 let u = [];
 let v = [];
 let u_new = [];
+let drop_amount = 1;
+
 
 //clamp to edges
 function get_u( _x, _y) {
@@ -36,12 +38,17 @@ $("#togglecaustics").click(function() {
 	doCaustics = !doCaustics;
 });
 
+$("#dropAmount").oninput = function(){
+	drop_amount = this.value / 20.0;
+	console.log("F");
+};
+
 
 let toggle = false;
 function droplet(){
-	let amount = 15;
+	let amount = drop_amount;
 	toggle = !toggle;
-	if(toggle) amount = -15;
+	if(toggle) amount = -1 * drop_amount;
 
 	if(Math.random() < 0.5) amount = -15;
 	u[
@@ -95,14 +102,18 @@ function setup(){
 	initFluid();
 }
 
+let counter = 10;
 function draw(){
 	clear();
 	background(128);
 	loadPixels();
 		//TODO: render some shit
+		counter--;
+		
 		vstep();
 		//for(let i = 0; i < 10; i++) 
-		droplet();
+		if(counter == 0)
+		{droplet();counter = 10;}
 		if(!doCaustics)
 		{
 			for(let i = 0; i < width; i++)
