@@ -66,7 +66,7 @@ function vstep(){
 				get_u(i, j - 1) + 
 				get_u(i, j + 1)) * 0.25 
 				- get_u(i, j);
-		v[i][j] *= 0.999;
+		v[i][j] *= 0.99;
 		u_new[i][j] += v[i][j]
 	
 	}
