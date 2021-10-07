@@ -144,8 +144,8 @@ function draw(){
 				deriv.normalize();
 				
 				let val = deriv.dot(vertvec);
-				val *= val;
-				val = 1 - val;
+				val *= val;		//square for contrast
+				val = 1 - val;  //invert it
 				//val = Math.pow(val, 2)
 				//val = 1 - val;
 				//For every pixel...
